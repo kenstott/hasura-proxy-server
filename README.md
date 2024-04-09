@@ -12,7 +12,7 @@ available.
 
 This repo includes the hasura proxy server, along with several sample plugins.
 
-You can try this out in several ways, which is explained in [Getting Started](#gettingstarted)
+You can try this out in several ways, which is explained in [Getting Started](#getting-started)
 
 ## Prerequisites
 
