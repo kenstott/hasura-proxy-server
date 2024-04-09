@@ -20,7 +20,7 @@ You can try this out in several ways, which is explained in [Getting Started](#g
   - Typescript
   - NodeJS 20> or Deno
   - Python - for the anomaly detection plugin
-- or alternatively download docker (you cand find it at [Docker.com](https://www.docker.com/products/docker-desktop/) for a quick demo without having to download any additional development tools.
+- or alternatively download docker (you can find it at [Docker.com](https://www.docker.com/products/docker-desktop/) for a quick demo without having to download any additional development tools.
 - optionally a Hasura GraphQL Engine login. (If you don't have one head to [Hasura Cloud](http://cloud.hasura.io) and sign-up). Otherwise we'll use a demo account setup just to illustrate the use of the proxy server.
 - optionally a MongoDB login (you can create one here: [MongoDB Atlas](https://www.mongodb.com/lp/cloud/atlas)).
 
@@ -37,6 +37,8 @@ docker compose up
 ```
 
 Connect to http://localhost:8080 - and you should see something like this:
+
+![Initial Query Screen](/docs/images/intro-screen.png)
 
 ## Limitations
 
