@@ -1,4 +1,12 @@
 # syntax=docker/dockerfile:1.7-labs
+FROM python:3.9 as build
+
+WORKDIR /usr/src/app
+COPY requirements.txt .
+RUN python -m venv /opt/app/venv
+ENV PATH="/usr/src/app/venv/bin:$PATH"
+RUN pip install -r requirements.txt
+
 # Use an official Node.js image as the base
 FROM node:20
 
@@ -14,12 +22,13 @@ COPY .stub.env ./.env
 RUN npm install
 
 # Copy the rest of the application code
-COPY --exclude=.env --exclude=.deno.env --exclude=var.env . .
+COPY ./src ./src
+COPY ./tsconfig.json .
 
-RUN npm run compile
+RUN npm run node:compile
 
 # Expose the port your application runs on
 EXPOSE 4000
 
 # Start your application
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "node:run"]

@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   hasura-proxy-server:
-    image: hasura-proxy-server:latest  # Replace with the actual image name and version
+    image: kstott/hasura-proxy-server:latest  # Replace with the actual image name and version
     env_file:
       - ./var.env
     ports:
