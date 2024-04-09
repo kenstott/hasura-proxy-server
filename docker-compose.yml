@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  hasura-proxy-server:
+    image: hasura-proxy-server:latest  # Replace with the actual image name and version
+    env_file:
+      - ./var.env
+    ports:
+      - '8080:4000'  # Expose port 4000 on your host machine
+    volumes:
+      - ./custom-plugins:/custom-plugins  # Mount local folder into the container (adjust paths as needed)
+    environment:
+      CUSTOM_ENV_VAR: your_value  # Set any custom environment variables needed by your image
+    command: [ "npm", "run", "start" ]  # Specify the startup command
+
+# Add other services or configurations as needed

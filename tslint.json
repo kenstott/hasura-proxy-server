@@ -1,0 +1,5 @@
+{
+  "rules": {
+    "@typescript-eslint/import-can-be-shortened": "off"
+  }
+}
