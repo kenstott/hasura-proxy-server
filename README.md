@@ -1,6 +1,6 @@
 # hasura-proxy-server
 
-A simple solution which proxies a Hasura GraphQL Engine (HGE).
+Add new features and capabilities your Hasura GraphQL endpoint using the Hasura Proxy Server.
 
 The HGE is a phenomenal low-code product that lets you generate GraphQL endpoints at a fraction of the cost
 of many other tools.
