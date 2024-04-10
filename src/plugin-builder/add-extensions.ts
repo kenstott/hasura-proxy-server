@@ -1,4 +1,4 @@
-import {type FormattedExecutionResult} from '../common/index.js'
+import { type FormattedExecutionResult } from '../common/index.js'
 
 /**
  * @description a helper function that assists a server plugin to mutate a GraphQL response by adding to the
@@ -7,8 +7,8 @@ import {type FormattedExecutionResult} from '../common/index.js'
  * @param item {Record<string, any>} the object to add to extensions
  */
 export const addToExtensions = (executionResult: FormattedExecutionResult, item: Record<string, any>): void => {
-    executionResult.extensions = {
-        ...(executionResult.extensions ?? {}),
-        ...item
-    }
+  executionResult.extensions = {
+    ...(executionResult.extensions ?? {}),
+    ...item
+  }
 }

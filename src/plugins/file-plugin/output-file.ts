@@ -27,9 +27,9 @@ const mimeTypes = {
   [FileFormat.json]: 'application/json'
 }
 export const outputFile = {
-  [FileOutput.stream]: (file: string, format: FileFormat) => intoStream(file),
-  [FileOutput.base64]: (file: string | Uint8Array, format: FileFormat) => Buffer.from(file).toString('base64'),
-  [FileOutput.string]: (file: string, format: FileFormat) => file,
-  [FileOutput.native]: (file: any, format: FileFormat) => file,
+  [FileOutput.stream]: (file: string, _format: FileFormat) => intoStream(file),
+  [FileOutput.base64]: (file: string | Uint8Array, _format: FileFormat) => Buffer.from(file).toString('base64'),
+  [FileOutput.string]: (file: string, _format: FileFormat) => file,
+  [FileOutput.native]: (file: any, _format: FileFormat) => file,
   [FileOutput.dataUri]: (file: string | Uint8Array, format: FileFormat) => `data:${mimeTypes[format]};base64,${Buffer.from(file).toString('base64')}`
 }

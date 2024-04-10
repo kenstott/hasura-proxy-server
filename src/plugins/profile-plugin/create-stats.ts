@@ -2,7 +2,26 @@ import * as aq from 'arquero'
 import { op } from 'arquero'
 import { type ColumnAnalysis, ScalarType, type Stats } from './types'
 
-const statOps = (column: string): any => ({
+export interface Stringable {
+  /**
+   * String coercion method.
+   */
+  toString: () => string
+}
+export type Params = Record<string, any>
+export type TableExprString = string | Stringable
+/**
+ * A struct object with arbitrary named properties.
+ */
+export type Struct = Record<string, any>
+/**
+ * A function defined over a table row.
+ */
+export type TableExprFunc = (d?: Struct, $?: Params) => any
+export type TableExpr = TableExprFunc | TableExprString
+
+export type ExprObject = Record<string, TableExpr>
+const statOps = (column: string): ExprObject => ({
   mean: op.mean(column),
   min: op.min(column),
   max: op.max(column),
@@ -13,7 +32,7 @@ const statOps = (column: string): any => ({
   stdev: op.stdev(column),
   sum: op.sum(column)
 })
-const quantiles = (column: string, range: number[]): any => range.reduce((acc, i) => ({
+const quantiles = (column: string, range: number[]): ExprObject => range.reduce((acc, i) => ({
   ...acc,
   [i.toString()]: op.quantile(column, i)
 }), {})

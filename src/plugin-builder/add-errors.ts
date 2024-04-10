@@ -1,4 +1,4 @@
-import {FormattedExecutionResult, GraphQLError} from '../common/index.js'
+import { type FormattedExecutionResult, GraphQLError } from '../common/index.js'
 
 /**
  * @description a helper function that assists a server plugin to mutate a GraphQL response by adding an error
@@ -9,5 +9,5 @@ import {FormattedExecutionResult, GraphQLError} from '../common/index.js'
  * @param extensions
  */
 export const addToErrors = (executionResult: FormattedExecutionResult, error: Error, extensions?: Record<string, any>): void => {
-    executionResult.errors = [...executionResult.errors ?? [], new GraphQLError(error.message, {extensions})]
+  executionResult.errors = [...executionResult.errors ?? [], new GraphQLError(error.message, { extensions })]
 }
