@@ -2,17 +2,19 @@
 
 Add new features and capabilities your Hasura GraphQL endpoint using the Hasura Proxy Server.
 
+For example, field-level traces, data validation, data profiling, and naming standards enforcement are all simple and easy to do with the hasura-proxy-server.
+
 The HGE is a phenomenal low-code product that lets you generate GraphQL endpoints at a fraction of the cost
 of many other tools.
 
 ## Why?
 The hasura-proxy-server facilitates a special class of plugins to augment Hasura features. Overtime I expect
-some of the good ideas may become part of the Hasura offering and/or a more robust plugin architecture will become
+some of the good ideas may become part of the Hasura offering and/or a plugin architecture will become
 available.
 
 This repo includes the hasura proxy server, along with several sample plugins.
 
-You can try this out in several ways, which is explained in [Getting Started](#getting-started)
+[Getting Started](#getting-started) explains your alternatives in demoing it. 
 
 ## Prerequisites
 
@@ -57,6 +59,17 @@ Enter this in the headers area:
   "x-hasura-admin-secret": "6vzvekRIQ22nR7B5wJLYPXopg4IdcctCHyevpEI4QFQH7ErgPEL6I540qFwDj60q"
 }
 ```
+
+Click on the query button, and you should see this:
+
+![Sample Query Results](/docs/images/query-results.png)
+
+The demo has 9 different plugins installed. One of them is the field-tracking plugin. If you go to your docker container and look in the logs you would see something like this:
+
+![Query Log](/docs/images/log.png)
+
+You can see that trace has been product with an attribute that references card.id. Telling you that the field was queried, the query (or context) it was queried, and the authenticated
+userid (if there is one).
 
 ## Limitations
 
