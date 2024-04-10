@@ -1,6 +1,6 @@
 # hasura-proxy-server
 
-A simple solution which proxies a Hasura GraphQL Engine (HGE).
+Add new features and capabilities your Hasura GraphQL endpoint using the Hasura Proxy Server.
 
 The HGE is a phenomenal low-code product that lets you generate GraphQL endpoints at a fraction of the cost
 of many other tools.
@@ -18,7 +18,7 @@ You can try this out in several ways, which is explained in [Getting Started](#g
 
 - If you want to rebuild from source:
   - Typescript
-  - NodeJS 20> or Deno
+  - NodeJS 20+ or Deno
   - Python - for the anomaly detection plugin
 - or alternatively download docker (you can find it at [Docker.com](https://www.docker.com/products/docker-desktop/) for a quick demo without having to download any additional development tools.
 - optionally a Hasura GraphQL Engine login. (If you don't have one head to [Hasura Cloud](http://cloud.hasura.io) and sign-up). Otherwise we'll use a demo account setup just to illustrate the use of the proxy server.
@@ -39,6 +39,24 @@ docker compose up
 Connect to http://localhost:8080 - and you should see something like this:
 
 ![Initial Query Screen](/docs/images/intro-screen.png)
+
+You will be connected to a demo instance of Hasura GraphQL Engine. To verify that its working, enter this query in the operation window:
+
+```gql
+query listCarts {
+  carts {
+    id
+  }
+}
+```
+
+Enter this in the headers area:
+
+```json
+{
+  "x-hasura-admin-secret": "6vzvekRIQ22nR7B5wJLYPXopg4IdcctCHyevpEI4QFQH7ErgPEL6I540qFwDj60q"
+}
+```
 
 ## Limitations
 
