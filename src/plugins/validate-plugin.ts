@@ -18,7 +18,7 @@ export const validatePlugin = plugin({
   operationDirective: '@validate(jsonSchema: String!, verbose: Boolean = true, allErrors: Boolean = true, strict: Boolean = true)',
 
   // Define your arg defaults in TypeScript - to match the arg defaults in your SDL
-  argDefaults: { verbose: true, allErrors: true, strict: true },
+  argDefaults: { verbose: true, allErrors: true, strict: false },
 
   // Define how to process your operation directive here...
   willSendResponsePluginResolver: async ({ operation, context, singleResult, args, span }) => {
@@ -43,7 +43,7 @@ export const validatePlugin = plugin({
       validator(singleResult.data)
 
       // Extract any errors
-      const { errors } = validator
+      const errors = validator.errors?.filter(i => i.keyword !== 'if')
 
       // Report errors - decided to do these as discrete traces...but not a requirement
       for (const error of errors ?? []) {

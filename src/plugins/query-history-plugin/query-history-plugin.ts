@@ -67,7 +67,8 @@ export const queryHistoryPlugin = plugin({
     const {
       args: ctxArgs,
       addToErrors,
-      addToExtensions
+      addToExtensions,
+      variables
     } = context
     const {
       collection,
@@ -78,8 +79,7 @@ export const queryHistoryPlugin = plugin({
     } = args as QueryHistoryPluginArgs
     const {
       query,
-      operationName,
-      variables
+      operationName
     } = ctxArgs
     span?.setAttributes(ctxArgs)
     try {

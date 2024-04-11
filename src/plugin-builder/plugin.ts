@@ -22,7 +22,7 @@ type ArgsContext = Attributes & {
   query: string
 }
 
-interface OperationResolveContext {
+export interface OperationResolveContext {
   args: ArgsContext
   variables: VariableValues
   startActiveTrace: <T>(name: string, fn: (span?: Span) => Promise<T>) => T

@@ -1,6 +1,6 @@
 import * as aq from 'arquero'
 import { op } from 'arquero'
-import { type ColumnAnalysis, ScalarType, type Stats } from './types'
+import { type ColumnAnalysis, ScalarType, type Stats } from '../helpers/index.js'
 
 export interface Stringable {
   /**

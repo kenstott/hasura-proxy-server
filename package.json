@@ -1,7 +1,7 @@
 {
   "name": "hasura-proxy-server",
   "version": "1.0.0",
-  "description": "Wraps a Hasura Server in an Apollo Plugin to provide ability to define additional directives.",
+  "description": "Wraps a Hasura Server in an Apollo Server to provide ability to define additional directives.",
   "main": "index.js",
   "scripts": {
     "deno:compile": "denoify",
@@ -33,7 +33,6 @@
     "change-case": "^5.4.4",
     "dayjs": "^1.11.10",
     "dotenv": "^16.4.5",
-    "env-cmd": "^10.1.0",
     "express": "^4.19.2",
     "flat": "^6.0.1",
     "graphql": "^16.8.1",
@@ -49,7 +48,6 @@
     "@types/dataframe-js": "^1.4.3",
     "@types/graphql-fields": "^1.3.9",
     "@types/lodash": "^4.17.0",
-    "@types/mathjs": "^9.4.2",
     "@types/node": "^20.12.2",
     "@typescript-eslint/eslint-plugin": "^7.5.0",
     "denoify": "^1.6.9",

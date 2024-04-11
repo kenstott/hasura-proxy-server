@@ -1,5 +1,5 @@
 import { createNarrowTable } from './create-narrow-table.js'
-import type { Analysis, ObjMap, ScalarType, ValueObservation } from './types.js'
+import type { Analysis, ObjMap, ScalarType, ValueObservation } from '../helpers/index.js'
 import * as aq from 'arquero'
 import { getScalarType } from './get-scalar-type.js'
 import { analyze } from './create-stats.js'

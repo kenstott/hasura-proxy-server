@@ -1,3 +1,5 @@
+import type { FormattedExecutionResult } from 'graphql/execution'
+
 export enum ScalarType {
   string,
   number,
@@ -35,3 +37,4 @@ export interface ColumnAnalysis {
 
 export type Analysis = Record<string, Record<string, ColumnAnalysis>>
 export type ObjMap<T> = Record<string, T>
+export type ExecutionResult = FormattedExecutionResult<ObjMap<Array<Record<string, unknown>>>>

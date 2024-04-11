@@ -1,5 +1,5 @@
 import { flatten } from 'flat'
-import type { ObjMap, ValueObservation } from './types'
+import type { ObjMap, ValueObservation } from '../helpers/index.js'
 import { getKeyMap } from './get-key-map'
 import * as aq from 'arquero'
 

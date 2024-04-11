@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb'
 import { type TypeFieldPair } from '../helpers/get-type-field-pairs'
-import { type ObjMap } from '../profile-plugin/types.js'
+import { type ObjMap } from '../helpers/index.js'
 import _ from 'lodash'
 import { type VariableValues } from '../../plugin-builder'
 
