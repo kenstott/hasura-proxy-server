@@ -1,6 +1,6 @@
 # hasura-proxy-server
 
-Add new features and capabilities your Hasura GraphQL endpoint using the Hasura Proxy Server.
+Add new features and capabilities to an existing Hasura GraphQL endpoint using the Hasura Proxy Server.
 
 For example, field-level traces, data validation, data profiling, and naming standards enforcement are all simple and easy to do with the hasura-proxy-server.
 
