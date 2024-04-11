@@ -69,7 +69,7 @@ The demo has 9 different plugins installed. One of them is the field-tracking pl
 
 ![Query Log](/docs/images/log.png)
 
-You can see that trace has been product with an attribute that references card.id. Telling you that the field was queried, the query (or context) it was queried, and the authenticated
+You can see that trace has been created with an attribute that references card.id. Telling you that the field was queried, the query (or context) it was queried, and the authenticated
 userid (if there is one).
 
 ## Limitations
@@ -82,7 +82,7 @@ userid (if there is one).
 
 This plugin will provide span traces with attributes identifying the Object Types and
 Fields referenced in a query. The plugin can optionally write field access records with relevant metadata
-to a mongodb collection.
+to a mongodb collection, to simplify reporting.
 
 You may have good metadata, and good role based access control to make sure the right people get to the right
 data. This plugin audits access, and provides a true history of access at the field level. This information
