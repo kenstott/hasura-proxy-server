@@ -48,6 +48,7 @@ You will be connected to a demo instance of Hasura GraphQL Engine. To verify tha
 query listCarts {
   carts {
     id
+    created_at
   }
 }
 ```
