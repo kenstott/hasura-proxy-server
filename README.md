@@ -74,7 +74,7 @@ userid (if there is one).
 
 ## Limitations
 
-- Subscriptions have not been tested, and will almost certainly not work without additional coding
+- Subscriptions are not supported.
 
 ## Plugins
 
