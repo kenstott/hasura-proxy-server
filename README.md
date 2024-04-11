@@ -1,18 +1,20 @@
 # hasura-proxy-server
 
-Add new features and capabilities your Hasura GraphQL endpoint using the Hasura Proxy Server.
+Add new features and capabilities to an existing Hasura GraphQL endpoint using the Hasura Proxy Server.
+
+For example, field-level traces, data validation, data profiling, and naming standards enforcement are all simple and easy to do with the hasura-proxy-server.
 
 The HGE is a phenomenal low-code product that lets you generate GraphQL endpoints at a fraction of the cost
 of many other tools.
 
 ## Why?
 The hasura-proxy-server facilitates a special class of plugins to augment Hasura features. Overtime I expect
-some of the good ideas may become part of the Hasura offering and/or a more robust plugin architecture will become
+some of the good ideas may become part of the Hasura offering and/or a plugin architecture will become
 available.
 
 This repo includes the hasura proxy server, along with several sample plugins.
 
-You can try this out in several ways, which is explained in [Getting Started](#getting-started)
+[Getting Started](#getting-started) explains your alternatives in demoing it. 
 
 ## Prerequisites
 
@@ -46,6 +48,7 @@ You will be connected to a demo instance of Hasura GraphQL Engine. To verify tha
 query listCarts {
   carts {
     id
+    created_at
   }
 }
 ```
@@ -58,17 +61,43 @@ Enter this in the headers area:
 }
 ```
 
+Click on the query button, and you should see this:
+
+![Sample Query Results](/docs/images/query-results.png)
+
+The demo has 9 different plugins installed. One of them is the field-tracking plugin. If you go to your docker container and look in the logs you would see something like this:
+
+![Query Log](/docs/images/log.png)
+
+You can see that trace has been created with an attribute that references card.id. Telling you that the field was queried, the query (or context) it was queried, and the authenticated
+userid (if there is one).
+
 ## Limitations
 
-- Subscriptions have not been tested, and will almost certainly not work without additional coding
+- Subscriptions are not supported.
 
 ## Plugins
+
+### Overview
+
+There are 8 sample plugins. Plugins can invoked automatically, or through an operation directive
+
+|Plugin Name|Address|Invoked By|Purpose|
+|-----------|-------|----------|-------|
+|Data Validator|./dist/plugins/validate-plugin.js|@validate|Validates a result set against a JSON Schema|
+|Sampler|./dist/pluglins/sample-plugin.js|@sample|Reduces the queried dataset by taking the first, last or random # of elements. Useful for a few scenarios, but an example might be to use the Data Validator plugin combined with Sampler, so that you only retrieve the records that failed the validator.|
+|Data Anomaly Detection|./dist/plugins/data-anomalies-plugin/data-anomalies-plugin.js|@anomalies|Identifies records in a queried result that are outliers.|
+|Field Tracking|./dist/plugins/field-tracking-plugin/field-tracking-plugin.js|automatic|Adds field level traces for all query operations|
+|Files|./dist/plugins/file-plugin/file-plugin.js|@file|Returns various file formats and output formats for a query operation|
+|Naming Standards|./dist/plugins/naming-standards-plugin/naming-standards-plugin.js|automatic|Enforces this pattern on query operation names `<verb><Object Type><optional list of adjectives and nouns>`. Provides additional, useful explanation on why a query was made. Can be used for support, audit or LLM prompt engineering|
+|Data Profiler|./dist/plugins/profile-plugin/profile-plugin.js|@profile|Provides various statistical measures for each scalar field in a query.|
+|History|./dist/plugins/query-history-plugin/query-history-plugin.js|@retain or automatic|Keeps a copy of every record returned in a query within a time series database. Used for creating historical dashboards, auditing, training data, undo, etc.|
 
 ### Field-Tracking-Plugin
 
 This plugin will provide span traces with attributes identifying the Object Types and
 Fields referenced in a query. The plugin can optionally write field access records with relevant metadata
-to a mongodb collection.
+to a mongodb collection, to simplify reporting.
 
 You may have good metadata, and good role based access control to make sure the right people get to the right
 data. This plugin audits access, and provides a true history of access at the field level. This information
