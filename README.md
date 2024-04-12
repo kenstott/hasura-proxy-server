@@ -82,7 +82,7 @@ userid (if there is one).
 
 ### Overview
 
-There are 8 sample plugins. Plugins can invoked automatically, or through an operation directive
+There are 8 sample plugins. Plugins can be invoked automatically, or through an operation directive
 
 The plugins are loaded dynamically at runtime. They are referenced in the `.env` file. 
 (Deno uses the `.deno.env file`, and the docker image uses `var.env`) in the variables: `PLUGINS`. This allows you
@@ -90,7 +90,7 @@ to use the docker image from docker hub with no code changes - but enhance at ru
 
 As long as you use the same source code layout, and create a plugin, you can reference it remotely. 
 You have to use the same source code layout so that the helper modules you reference
-can be found in the local runtime image, after importing your remote plugin.
+can be found in the docker runtime image, after importing your remote plugin.
 
 Alternatively - if you are using the NodeJS runtime for the proxy server, you can bundle the plugin using `@vercel/ncc`. 
 See the sample script for doing this in `package.json/sample:build:plugin`. In this approach you 
