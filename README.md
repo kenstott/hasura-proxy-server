@@ -82,7 +82,7 @@ userid (if there is one).
 
 ### Overview
 
-There are 8 sample plugins. Plugins can invoked automatically, or through an operation directive
+There are 8 sample plugins. Plugins can be invoked automatically, or through an operation directive
 
 The plugins are loaded dynamically at runtime. They are referenced in the `.env` file. 
 (Deno uses the `.deno.env file`, and the docker image uses `var.env`) in the variables: `PLUGINS`. This allows you
