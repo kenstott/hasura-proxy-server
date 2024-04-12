@@ -253,8 +253,8 @@ Note the extensions attribute. There will be a single trace for each error recor
 
 ## Related Plugins
 
-[sample-plugin](./src/plugins/sample-plugin/README.md). When evaluating a large dataset, and the sole interest is in understanding errors, you can sample the
+[sample-plugin](../sample-plugin/README.md). When evaluating a large dataset, and the sole interest is in understanding errors, you can sample the
 original dataset to a smaller sample record set using this plugin, while still evaluating the entire dataset.
 
-[field-tracking-plugin](./src/plugins/field-tracking-plugin/README.md). This plugin is automatically invoked.
+[field-tracking-plugin](../field-tracking-plugin/README.md). This plugin is automatically invoked.
 
