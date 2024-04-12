@@ -85,7 +85,7 @@ There are 8 sample plugins. Plugins can invoked automatically, or through an ope
 |Plugin Name|Address|Invoked By|Purpose|
 |-----------|-------|----------|-------|
 |Data Validator|./dist/plugins/validate-plugin.js|@validate|Validates a result set against a JSON Schema|
-|Sampler|./dist/pluglins/sample-plugin.js|@sample|Reduces the queried dataset by taking the first, last or random # of elements. Useful for a few scenarios, but an example might be to use the Data Validator plugin combined with Sampler, so that you only retrieve the records that failed the validator.|
+|Sampler|./dist/plugins/sample-plugin.js|@sample|Reduces the queried dataset by taking the first, last or random # of elements. Useful for a few scenarios, but an example might be to use the Data Validator plugin combined with Sampler, so that you only retrieve the records that failed the validator.|
 |Data Anomaly Detection|./dist/plugins/data-anomalies-plugin/data-anomalies-plugin.js|@anomalies|Identifies records in a queried result that are outliers.|
 |Field Tracking|./dist/plugins/field-tracking-plugin/field-tracking-plugin.js|automatic|Adds field level traces for all query operations|
 |Files|./dist/plugins/file-plugin/file-plugin.js|@file|Returns various file formats and output formats for a query operation|
