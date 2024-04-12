@@ -34,7 +34,7 @@ query findCarts {
   }
 }
 ```
-Lets assume we want to identify all negative quantities when a is_complete === true. We could write
+Lets assume we want to identify all negative quantities when is_complete === true. We could write
 this JSON Schema definition.
 
 ```json
@@ -179,12 +179,16 @@ MongoDB connection string must be provided as an environment variable named: `MO
 
 ## Parameters
 
-|Name|Type|Purpose|
-|----|----|-------|
- |jsonSchema|String!|This is the only required field. It must be a properly formatted JSON Schema describing the entire result set.|
-|verbose|Boolean|Defaults to true. Adds the actual value of a field when a rule fails. You may need to make this false for non-public information|
-|allErrors|Boolean|Defaults to true. When true, all records are evaluated. When false, the validation stops after the first error|
-|strict|Boolean|Defaults to false. When true enforces all JSON Schema requirements.|
+```graphql
+@validate(jsonSchema: String!, verbose: Boolean = true, allErrors: Boolean = true, strict: Boolean = true)
+```
+
+| Name       | Type    | Purpose                                                                                                                          |
+|------------|---------|----------------------------------------------------------------------------------------------------------------------------------|
+| jsonSchema | String! | This is the only required field. It must be a properly formatted JSON Schema describing the entire result set.                   |
+| verbose    | Boolean | Defaults to true. Adds the actual value of a field when a rule fails. You may need to make this false for non-public information |
+| allErrors  | Boolean | Defaults to true. When true, all records are evaluated. When false, the validation stops after the first error                   |
+| strict     | Boolean | Defaults to false. When true enforces all JSON Schema requirements.                                                              |
 
 ## Traces
 
@@ -246,3 +250,11 @@ Will create traces in this format:
 ```
 
 Note the extensions attribute. There will be a single trace for each error record.
+
+## Related Plugins
+
+[sample-plugin](./src/plugins/sample-plugin/README.md). When evaluating a large dataset, and the sole interest is in understanding errors, you can sample the
+original dataset to a smaller sample record set using this plugin, while still evaluating the entire dataset.
+
+[field-tracking-plugin](./src/plugins/field-tracking-plugin/README.md). This plugin is automatically invoked.
+
