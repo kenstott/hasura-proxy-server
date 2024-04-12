@@ -188,4 +188,61 @@ MongoDB connection string must be provided as an environment variable named: `MO
 
 ## Traces
 
-Will create traces in this format
+Will create traces in this format:
+
+```json
+{
+ "traceId": "e77ab8841a884fafc7a1e07460f90d7b",
+ "spanId": "a90d871c0bce8fa1",
+ "timestamp": "2024-04-12T18:16:51.306Z",
+ "attributes": {
+  "verbose": true,
+  "allErrors": true,
+  "strict": false,
+  "jsonSchema": "{ \"type\": \"object\", \"description\": \"Schema validation for Sales Analytics data set\", \"properties\": { \"carts\": { \"type\": \"array\", \"items\": { \"type\": \"object\", \"properties\": { \"user\": { \"type\": \"object\", \"properties\": { \"name\": { \"type\": \"string\" } } }, \"is_complete\": { \"description\": \"Purchase was completed\", \"type\": \"boolean\" }, \"cart_items\": { \"type\": \"array\", \"items\": { \"type\": \"object\", \"properties\": { \"quantity\": { \"type\": \"number\" }, \"product\": { \"type\": \"object\", \"properties\": { \"name\": { \"type\": \"string\" }, \"manufacturer\": { \"type\": \"object\", \"properties\": { \"name\": { \"type\": \"string\" } } } } } } } } }, \"if\": { \"properties\": { \"is_complete\":{ \"const\": true } } }, \"then\": { \"properties\": { \"is_complete\": { \"const\": true }, \"cart_items\": { \"type\": \"array\", \"items\": { \"type\": \"object\", \"properties\": { \"quantity\": { \"description\": \"Refunds must not be represented as negative quantities\", \"minimum\": 1 } } } } } } } } }}",
+  "operationName": "findCarts",
+  "directiveName": "validate",
+  "query": "query findCarts @validate(jsonSchema: \"{ \\\"type\\\": \\\"object\\\", \\\"description\\\": \\\"Schema validation for Sales Analytics data set\\\", \\\"properties\\\": { \\\"carts\\\": { \\\"type\\\": \\\"array\\\", \\\"items\\\": { \\\"type\\\": \\\"object\\\", \\\"properties\\\": { \\\"user\\\": { \\\"type\\\": \\\"object\\\", \\\"properties\\\": { \\\"name\\\": { \\\"type\\\": \\\"string\\\" } } }, \\\"is_complete\\\": { \\\"description\\\": \\\"Purchase was completed\\\", \\\"type\\\": \\\"boolean\\\" }, \\\"cart_items\\\": { \\\"type\\\": \\\"array\\\", \\\"items\\\": { \\\"type\\\": \\\"object\\\", \\\"properties\\\": { \\\"quantity\\\": { \\\"type\\\": \\\"number\\\" }, \\\"product\\\": { \\\"type\\\": \\\"object\\\", \\\"properties\\\": { \\\"name\\\": { \\\"type\\\": \\\"string\\\" }, \\\"manufacturer\\\": { \\\"type\\\": \\\"object\\\", \\\"properties\\\": { \\\"name\\\": { \\\"type\\\": \\\"string\\\" } } } } } } } } }, \\\"if\\\": { \\\"properties\\\": { \\\"is_complete\\\":{ \\\"const\\\": true } } }, \\\"then\\\": { \\\"properties\\\": { \\\"is_complete\\\": { \\\"const\\\": true }, \\\"cart_items\\\": { \\\"type\\\": \\\"array\\\", \\\"items\\\": { \\\"type\\\": \\\"object\\\", \\\"properties\\\": { \\\"quantity\\\": { \\\"description\\\": \\\"Refunds must not be represented as negative quantities\\\", \\\"minimum\\\": 1 } } } } } } } } }}\")  {\n  carts {\n    user {\n      name\n    }\n    is_complete\n    cart_items {\n      quantity\n      product {\n        name\n        manufacturer {\n          name\n        }\n      }\n    }\n  }\n}",
+  "userID": "123",
+  "extension": {
+   "instancePath": "/carts/0/cart_items/2/quantity",
+   "schemaPath": "#/properties/carts/items/then/properties/cart_items/items/properties/quantity/minimum",
+   "keyword": "minimum",
+   "params": {
+    "comparison": ">=",
+    "limit": 1
+   },
+   "message": "must be >= 1",
+   "schema": 1,
+   "parentSchema": {
+    "description": "Refunds must not be represented as negative quantities",
+    "minimum": 1
+   },
+   "data": -2
+  }
+ },
+ "links": [],
+ "events": [],
+ "status": {
+  "code": 1
+ },
+ "endTime": [
+  1712945811,
+  304109166
+ ],
+ "_ended": true,
+ "_duration": [
+  0,
+  16109166
+ ],
+ "name": "validate-plugin.js",
+ "parentSpanId": "554df27e72690917",
+ "kind": 0,
+ "startTime": [
+  1712945811,
+  288000000
+ ]
+}
+```
+
+Note the extensions attribute. There will be a single trace for each error record.

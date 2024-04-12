@@ -98,7 +98,7 @@ have no module dependencies between the proxy server and the plugin.
 
 | Plugin Name                                                     |Address|Invoked By|Purpose|
 |-----------------------------------------------------------------|-------|----------|-------|
-| Data Validator                                                  |./dist/plugins/validate-plugin.js|@validate|Validates a result set against a JSON Schema|
+| [Data Validator](./src/plugins/validate-plugin/README.md)       |./dist/plugins/validate-plugin.js|@validate|Validates a result set against a JSON Schema|
 | Sampler                                                         |./dist/plugins/sample-plugin.js|@sample|Reduces the queried dataset by taking the first, last or random # of elements. Useful for a few scenarios, but an example might be to use the Data Validator plugin combined with Sampler, so that you only retrieve the records that failed the validator.|
 | Data Anomaly Detection                                          |./dist/plugins/data-anomalies-plugin/data-anomalies-plugin.js|@anomalies|Identifies records in a queried result that are outliers.|
 | [Field Tracking](./src/plugins/field-tracking-plugin/README.md) |./dist/plugins/field-tracking-plugin/field-tracking-plugin.js|automatic|Adds field level traces for all query operations|
