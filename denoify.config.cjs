@@ -3,7 +3,7 @@
 /** @type { import('denoify/lib/config/parseParams').DenoifyParams } */
 const config = {
     ports: {
-        "graphql": "npm:graphql@16.8.1"
+        "mongodb": "https://deno.land/x/mongo@v0.33.0/mod.ts"
     }
 }
 

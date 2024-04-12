@@ -3,14 +3,15 @@ import {
   ConsoleMetricExporter,
   ConsoleSpanExporter,
   OTLPTraceExporter,
-  PeriodicExportingMetricReader
+  PeriodicExportingMetricReader,
+  type MetricReader
 } from '../common/index.js'
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
 import { SimpleSpanProcessor, type SpanExporter } from '@opentelemetry/sdk-trace-base'
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto'
 import { type Attributes, type Span, SpanStatusCode, trace } from '@opentelemetry/api'
 import {
-  MONGODB_CONNECTION_STRING,
+  MONGODB_CONNECTION_STRING, MONGODB_SPAN_ATTRIBUTE_FILTERS,
   MONGODB_TO_CONSOLE,
   OTEL_EXPORTER_OTLP_ENDPOINT,
   OTEL_SERVICE_NAME
@@ -28,17 +29,26 @@ if (OTEL_EXPORTER_OTLP_ENDPOINT) {
 const exporter = oltpMetricExports ?? consoleMetricExporter
 
 if (MONGODB_TO_CONSOLE || MONGODB_CONNECTION_STRING) {
+  const spanFilters = (MONGODB_SPAN_ATTRIBUTE_FILTERS || '').split(',').map(i => {
+    const [name, value] = i.split(':')
+    return { name, value }
+  })
+  const matchSpanAttributeNameAndValue = (attributes: Attributes): boolean => {
+    return Object.entries(attributes).reduce((acc, [name, value]) => {
+      return acc && spanFilters.findIndex(i => i.name === name && i.value === value) === -1
+    }, true)
+  }
   const mongodbTraceExporter = new MongoTraceExporter(
     MONGODB_CONNECTION_STRING ?? '',
     MONGODB_TO_CONSOLE === 'true',
-    (span) => !!span.attributes.directiveName)
+    (span) => !!span.attributes.directiveName && matchSpanAttributeNameAndValue(span.attributes))
   const mongoSpanProcessor = new SimpleSpanProcessor(mongodbTraceExporter)
   spanProcessors.push(mongoSpanProcessor)
 }
 
 const sdk = new NodeSDK({
   spanProcessors,
-  metricReader: new PeriodicExportingMetricReader({ exporter }),
+  metricReader: (new PeriodicExportingMetricReader({ exporter })) as MetricReader,
   autoDetectResources: true,
   instrumentations: [getNodeAutoInstrumentations()]
 })

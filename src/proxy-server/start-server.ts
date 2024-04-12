@@ -1,11 +1,11 @@
 import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
-import { hasuraWrapper } from './hasura-wrapper'
+import { hasuraWrapper } from './hasura-wrapper.js'
 import assert from 'assert'
-import { hasuraContext } from './hasura-context'
-import { HASURA_ADMIN_SECRET, HASURA_URI, PORT } from './config'
+import { hasuraContext } from './hasura-context.js'
+import { HASURA_ADMIN_SECRET, HASURA_URI, PORT } from './config.js'
 import { type HasuraContext, type HasuraPlugin } from '../common/index.js'
-import { startActiveTrace } from './telemetry'
+import { startActiveTrace } from './telemetry.js'
 
 /**
  * @description Abstracts away all details of instantiating the Apollo Server as a Hasura Proxy.

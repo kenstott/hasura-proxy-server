@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "deno:compile": "denoify",
-    "deno:run": "deno run --allow-run --allow-sys --allow-env --allow-read --allow-net --inspect deno_dist/index.ts",
+    "deno:run": "deno task start",
     "node:compile": "tsc",
     "node:compile:watch": "tsc --watch",
     "node:debug:watch": "run-p node:compile:watch node:debug",
@@ -50,6 +50,7 @@
     "@types/lodash": "^4.17.0",
     "@types/node": "^20.12.2",
     "@typescript-eslint/eslint-plugin": "^7.5.0",
+    "@vercel/ncc": "^0.38.1",
     "denoify": "^1.6.9",
     "esbuild": "^0.20.2",
     "eslint": "^8.57.0",
@@ -60,6 +61,7 @@
     "eslint-plugin-promise": "^6.1.1",
     "nodemon": "^3.1.0",
     "npm-run-all": "^4.1.5",
+    "rimraf": "^5.0.5",
     "tsc-module-loader": "^0.0.1",
     "typescript": "^5.4.3"
   },

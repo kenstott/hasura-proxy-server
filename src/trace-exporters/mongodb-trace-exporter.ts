@@ -1,10 +1,10 @@
 import { type ReadableSpan, type SpanExporter } from '@opentelemetry/sdk-trace-base'
-import { type ExportResult, ExportResultCode } from '@opentelemetry/core'
+import { type ExportResult, ExportResultCode } from '../common/problem-imports.js'
 import { MongoClient } from 'mongodb'
 import _ from 'lodash'
 
 export class MongoTraceExporter implements SpanExporter {
-  private readonly db: Promise<MongoClient>
+  private readonly db: MongoClient
   private readonly toConsole: boolean
 
   constructor (connectionString: string, toConsole: boolean, filter?: (span: ReadableSpan) => boolean) {
@@ -12,7 +12,7 @@ export class MongoTraceExporter implements SpanExporter {
       this.toConsole = toConsole
     }
     if (connectionString) {
-      this.db = MongoClient.connect(connectionString)
+      this.db = new MongoClient(connectionString)
     }
     if (filter) {
       this.filter = filter
@@ -43,28 +43,23 @@ export class MongoTraceExporter implements SpanExporter {
     }
     if (this.db !== undefined && documents.length) {
       const directiveNames = [...new Set(documents.map(i => i.attributes?.directiveName ?? ''))] as string[]
-      this.db.then(db => {
-        for (const directiveName of directiveNames) {
-          const collection = db.db().collection(directiveName)
-          collection.insertMany(documents.filter(i => i.attributes?.directiveName === directiveName)).then(() => {
-            if (directiveName === directiveNames[directiveNames.length - 1]) {
-              resultCallback({ code: ExportResultCode.SUCCESS })
-            }
-          }).catch((error) => {
-            resultCallback({ code: ExportResultCode.FAILED, error })
-          })
-        }
-      }).catch(error => {
-        resultCallback({ code: ExportResultCode.FAILED, error })
-      })
+
+      for (const directiveName of directiveNames) {
+        const collection = this.db.db().collection(directiveName)
+        collection.insertMany(documents.filter(i => i.attributes?.directiveName === directiveName)).then(() => {
+          if (directiveName === directiveNames[directiveNames.length - 1]) {
+            resultCallback({ code: ExportResultCode.SUCCESS })
+          }
+        }).catch((error) => {
+          resultCallback({ code: ExportResultCode.FAILED, error })
+        })
+      }
     }
   }
 
   async shutdown (): Promise<void> {
     // Clean up any resources if needed
-    await this.db.then(async (client) => {
-      await client.close()
-    })
+    await this.db.close()
   }
 
   private readonly filter = (span: ReadableSpan): boolean => !!span

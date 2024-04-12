@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "lib": ["deno.window"],
+    "strict": true
+  },
+  "lint": {
+    "include": ["src/"],
+    "exclude": ["src/testdata/", "src/fixtures/**/*.ts"],
+    "rules": {
+      "tags": ["recommended"],
+      "include": ["ban-untagged-todo"],
+      "exclude": ["no-unused-vars"]
+    }
+  },
+  "fmt": {
+    "useTabs": true,
+    "lineWidth": 80,
+    "indentWidth": 4,
+    "semiColons": false,
+    "singleQuote": true,
+    "proseWrap": "preserve",
+    "include": ["src/", "custom-plugins/"],
+    "exclude": ["src/testdata/", "src/fixtures/**/*.ts"]
+  },
+  "lock": false,
+  "nodeModulesDir": true,
+  "unstable": ["webgpu"],
+  "npmRegistry": "https://registry.npmjs.org/",
+  "test": {
+    "include": ["src/"],
+    "exclude": ["src/testdata/", "src/fixtures/**/*.ts"]
+  },
+  "tasks": {
+    "start": "deno run --allow-run --allow-sys --allow-env --allow-read --allow-net --inspect deno_dist/index.ts"
+  },
+  "imports": {
+    "oak": "https://deno.land/x/oak@v12.4.0/mod.ts"
+  },
+  "exclude": [
+    "dist/"
+  ]
+}
