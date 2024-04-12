@@ -1,8 +1,8 @@
 import Ajv from 'ajv'
 import addFormats from 'ajv-formats'
-import { plugin } from '../plugin-builder/index'
+import { plugin } from '../../plugin-builder'
 import _ from 'lodash'
-import { Kind } from '../common/index.js'
+import { Kind } from '../../common'
 
 /**
  * @description Adds @validate operation directive to queries, which will

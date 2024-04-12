@@ -1,7 +1,9 @@
 # field-tracking-plugin
 
 This plugin will provide span traces with attributes identifying the Object Types and
-Fields referenced in a query.
+Fields referenced in a query. The only complex problem was substituting the Object Type
+instead of the relationship name for sub-fields. In Hasura - the Object Type is how you trace
+back to the data source. So, it's important to have the Object Type and field for reporting.
 
 Sample Trace:
 ```json

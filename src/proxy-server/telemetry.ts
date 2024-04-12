@@ -50,7 +50,7 @@ const sdk = new NodeSDK({
   spanProcessors,
   metricReader: (new PeriodicExportingMetricReader({ exporter })) as MetricReader,
   autoDetectResources: true,
-  instrumentations: [getNodeAutoInstrumentations()]
+  instrumentations: [getNodeAutoInstrumentations({ '@opentelemetry/instrumentation-fs': { enabled: false } })]
 })
 
 sdk.start()
