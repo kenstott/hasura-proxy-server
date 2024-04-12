@@ -1,7 +1,7 @@
 # field-tracking-plugin
 
 This plugin will provide span traces with attributes identifying the Object Types and
-Fields referenced in a query.
+Fields referenced in a query. This is plugin is invoked automatically for all queries. The client does not have to use an operation directive.
 
 Sample Trace:
 ```json
