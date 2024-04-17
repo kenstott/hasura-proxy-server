@@ -7,7 +7,7 @@ invoked optionally through the @validate directive, its not too problematic.
 If you wanted to improve performance. You would push the AJV validation onto a worker thread, immediately release
 the query results, then publish the AJV validation through a queue, file or database push.
 
-It would be really interesting add the result as a value for each query root object and make it an @defer.
+It would be interesting to add the result as a value for each query root object and make it a @defer field.
 That would be the cleanest way to do it. But support for @defer with Apollo Server is not quite there
 yet.
 

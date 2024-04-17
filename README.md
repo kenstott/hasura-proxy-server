@@ -14,7 +14,7 @@ available.
 
 This repo includes the hasura proxy server, along with several sample plugins.
 
-[Getting Started](#getting-started) explains your alternatives in demoing it. 
+[Getting Started](#getting-started) explains your alternatives in demoing it and making changes. 
 
 ## Prerequisites
 
@@ -22,9 +22,11 @@ This repo includes the hasura proxy server, along with several sample plugins.
   - Typescript
   - NodeJS 20+ or Deno
   - Python - for the anomaly detection plugin
-alternatively, download docker (you can find it at [Docker.com](https://www.docker.com/products/docker-desktop/) for a quick demo without having to download any additional development tools.
-- optionally a Hasura GraphQL Engine login. (If you don't have one head to [Hasura Cloud](http://cloud.hasura.io) and sign-up). Otherwise, we'll use a demo account setup just to illustrate the use of the proxy server.
-- optionally a MongoDB login (you can create one here: [MongoDB Atlas](https://www.mongodb.com/lp/cloud/atlas)).
+- alternatively, 
+  - download docker (you can find it at [Docker.com](https://www.docker.com/products/docker-desktop/) for a quick demo without having to download any additional development tools.
+- optionally
+  - A Hasura GraphQL Engine login. (If you don't have one head to [Hasura Cloud](http://cloud.hasura.io) and sign-up). Otherwise, we'll use a demo account setup just to illustrate the use of the proxy server.
+  - A MongoDB login (you can create one here: [MongoDB Atlas](https://www.mongodb.com/lp/cloud/atlas)).
 
 ## Getting Started
 
@@ -39,6 +41,8 @@ docker compose up
 ```
 
 Connect to http://localhost:8080 - and you should see something like this:
+
+#### Initial Query
 
 ![Initial Query Screen](./docs/images/intro-screen.png)
 
@@ -71,6 +75,43 @@ The demo has 9 different plugins installed. One of them is the field-tracking pl
 
 You can see that a trace has been created with an attribute that references card.id. Telling you that the field was queried, the query (or context) it was queried, and the authenticated
 userid (if there is one).
+
+### Alternative #2 - Local NodeJS Debug Setup
+
+```shell
+npm install
+python -m venv ./.venv
+pip install -r requirements.txt
+npm run node:compile:watch
+```
+```shell
+npm run node:debug
+```
+
+Connect to http://localhost:4000 - and you should see something like this:
+
+[See initial query](#initial-query)
+
+### Alternative #3 - Local Deno Debug Setup
+
+One caution. When you switch from NodeJS to Deno and back, you need to
+remove node_modules/.deno and re-run npm install.
+
+You may end up with a debug port being left open if you are switching back and forth. A killall node|deno, and or exit and re-enter your IDE.
+
+```shell
+npm install
+python -m venv ./.venv
+pip install -r requirements.txt
+npm run deno:compile
+```
+```shell
+npm run deno:run
+```
+
+Connect to http://localhost:4000 - and you should see something like this:
+
+[See initial query](#initial-query)
 
 ## Limitations
 

@@ -5,6 +5,8 @@ Fields referenced in a query. The only complex problem was substituting the Obje
 instead of the relationship name for sub-fields. In Hasura - the Object Type is how you trace
 back to the data source. So, it's important to have the Object Type and field for reporting.
 
+This may have been resolved in Hasura v3, and may be an unnecessary plug-in if proxying to a v3 instance.
+
 Sample Trace:
 ```json
 {
