@@ -1,7 +1,7 @@
 import { config } from 'dotenv'
 import { altProcess } from '../common/index.js'
 
-// @ts-expect-error
+// @ts-expect-error Deno is only available when running under Deno engine
 if (typeof Deno !== 'undefined') {
   config({ path: '.deno.env' })
 } else {

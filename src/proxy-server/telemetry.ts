@@ -38,10 +38,11 @@ if (MONGODB_TO_CONSOLE || MONGODB_CONNECTION_STRING) {
       return acc && spanFilters.findIndex(i => i.name === name && i.value === value) === -1
     }, true)
   }
-  const mongodbTraceExporter = new MongoTraceExporter(
-    MONGODB_CONNECTION_STRING ?? '',
-    MONGODB_TO_CONSOLE === 'true',
-    (span) => !!span.attributes.directiveName && matchSpanAttributeNameAndValue(span.attributes))
+  const mongodbTraceExporter = new MongoTraceExporter({
+    connectionString: MONGODB_CONNECTION_STRING,
+    toConsole: MONGODB_TO_CONSOLE === 'true',
+    filter: (span) => !!span.attributes.directiveName && matchSpanAttributeNameAndValue(span.attributes)
+  })
   const mongoSpanProcessor = new SimpleSpanProcessor(mongodbTraceExporter)
   spanProcessors.push(mongoSpanProcessor)
 }

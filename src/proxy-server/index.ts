@@ -2,14 +2,12 @@ import { startServer } from './start-server.js'
 import { PLUGINS } from './config.js'
 import { altPath, altProcess, type HasuraPlugin } from '../common/index.js'
 import { createRequire } from 'module'
-// @ts-expect-error
+// @ts-expect-error Deno is only available when running under the Deno engine
 if (typeof Deno !== 'undefined') {
   // do nothing
 } else {
   // add require feature back to NodeJS globals - for ESM modules
-  const require = createRequire(import.meta.url)
-
-  global.require = require
+  global.require = createRequire(import.meta.url)
 }
 
 const plugins = [] as HasuraPlugin[]
