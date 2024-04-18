@@ -13,7 +13,9 @@
     "node:run": "node -r dotenv/config --experimental-loader tsc-module-loader --inspect ./dist/index.js",
     "sample:build:plugin": "npx ncc build src/plugins/data-anomalies-plugin/data-anomalies-plugin.ts -o custom-plugins/validator --target es2020 -m && npx ncc build src/plugins/profile-plugin/profile-plugin.ts -o custom-plugins/profiler --target es2020 -m ",
     "start": "npm run node:run",
-    "postinstall": "chmod +x choose.sh"
+    "postinstall": "chmod +x choose.sh",
+    "docker:build:image" : "docker build -t kstott/hasura-proxy-server .",
+    "docker:run": "docker compose up"
   },
   "author": "",
   "license": "ISC",
