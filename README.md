@@ -81,6 +81,7 @@ userid (if there is one).
 ```shell
 npm install
 python -m venv ./.venv
+python ./.venv/bin/activate_this.py
 pip install -r requirements.txt
 npm run node:compile:watch
 ```
@@ -102,6 +103,7 @@ You may end up with a debug port being left open if you are switching back and f
 ```shell
 npm install
 python -m venv ./.venv
+python ./.venv/bin/activate_this.py
 pip install -r requirements.txt
 npm run deno:compile
 ```

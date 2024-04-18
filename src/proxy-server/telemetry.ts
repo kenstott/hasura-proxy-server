@@ -67,7 +67,7 @@ altProcess.on('SIGTERM', () => {
   ).finally(() => altProcess.exit(0))
 })
 
-export const startActiveTrace = <T>(name: string, fn: (span?: Span) => Promise<T>): T => {
+export const startActiveTrace = async <T>(name: string, fn: (span?: Span) => Promise<T>): Promise<T> => {
   return trace.getTracer(OTEL_SERVICE_NAME ?? 'hasura-plugin-proxy', '1').startActiveSpan(name.split('/').pop() ?? 'unknown', async (span) => {
     try {
       const result = await fn(span)

@@ -46,6 +46,7 @@ export const dataAnomaliesPlugin = plugin({
       }
       getAnomalousRecords.destroy()
       // Add your new data into the extensions - OR - augment the original data
+      span?.setAttributes({ extensionJson: JSON.stringify(anomalies) })
       addToExtensions(singleResult, { anomalies })
     } catch (error) {
       // Trap processing errors like this...

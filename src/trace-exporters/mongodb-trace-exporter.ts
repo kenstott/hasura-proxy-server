@@ -51,12 +51,6 @@ export class MongoTraceExporter implements SpanExporter {
       return this.rewriter(span)
     })
 
-    if (this.toConsole && documents.length) {
-      for (const document of documents) {
-        console.log(JSON.stringify(document, null, 2))
-      }
-      resultCallback({ code: ExportResultCode.SUCCESS })
-    }
     if (this.db !== undefined && documents.length) {
       const directiveNames = [...new Set(documents.map(i => i.attributes?.directiveName ?? ''))] as string[]
 
@@ -70,6 +64,12 @@ export class MongoTraceExporter implements SpanExporter {
           resultCallback({ code: ExportResultCode.FAILED, error })
         })
       }
+    }
+    if (this.toConsole && documents.length) {
+      for (const document of documents) {
+        console.info(JSON.stringify(document, null, 2))
+      }
+      resultCallback({ code: ExportResultCode.SUCCESS })
     }
   }
 

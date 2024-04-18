@@ -25,7 +25,7 @@ type ArgsContext = Attributes & {
 export interface OperationResolveContext {
   args: ArgsContext
   variables: VariableValues
-  startActiveTrace: <T>(name: string, fn: (span?: Span) => Promise<T>) => T
+  startActiveTrace: <T>(name: string, fn: (span?: Span) => Promise<T>) => Promise<T>
   addToExtensions: (executionResult: FormattedExecutionResult, item: Record<string, any>) => void
   addToErrors: (executionResult: FormattedExecutionResult, error: Error, extensions?: Record<string, any>) => void
 }
@@ -104,7 +104,7 @@ export const plugin = ({
           }
           const operationName = _operationName ?? ''
           const variables = _variables ?? {}
-          startActiveTrace(import.meta.url, async (span) => {
+          await startActiveTrace(import.meta.url, async (span) => {
             if (response.body.kind === 'single') {
               const directive = operation?.directives?.find(i => i.name.value === operationDirectiveName)
               if (directive !== undefined || !operationDirectiveName) {
