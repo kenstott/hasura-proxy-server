@@ -163,3 +163,17 @@ original dataset to a smaller sample record set using this plugin, while still e
 
 [field-tracking-plugin](../field-tracking-plugin/README.md). This plugin is automatically invoked.
 
+## Design Considerations
+
+This plugin leverages Python. ML libraries in Python are very mature. But to take advantage of Python you must be able move 
+data from NodeJS/Deno to Python efficiently. They can't share the same memory space. To do this, we used Apache Arrow. 
+On the Typescript side we used their Arquero library to flatten and serialize into Arrow File Format, and then pushed 
+the Arrow File to Python. Python then used pyarrow to convert into a numpy array, compute the scores, 
+generate results in an Arrow File, and then push them back to NodeJS/Deno. 
+
+Arrow's zero-copy technology drastically reduces serialization/deserialization time, almost completely eliminating it.
+Making performance excellent.
+
+Beyond that, the Python process is started and kept open indefinitely while the NodeJS/Deno instance is running, and
+messaging is used to push the Arrow files back and forth. The persistently running Python engine, again dramatically
+speeds up processing, by eliminating spin-up time.
