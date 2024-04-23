@@ -47,7 +47,7 @@ export const validatePlugin = plugin({
 
       // Report errors - decided to do these as discrete traces...but not a requirement
       for (const error of errors ?? []) {
-        startActiveTrace(import.meta.url, async (span) => {
+        await startActiveTrace(import.meta.url, async (span) => {
           span?.setAttributes({ ..._.omit(ctxArgs, 'variables'), extensionJson: JSON.stringify(error) })
         })
       }

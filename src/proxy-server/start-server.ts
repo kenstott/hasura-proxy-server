@@ -13,7 +13,7 @@ import { startActiveTrace } from './telemetry.js'
  * retrieved from the call the HGE.
  */
 export const startServer = async (hasuraPlugins: HasuraPlugin[]): Promise<void> => {
-  startActiveTrace(import.meta.url, async (span) => {
+  await startActiveTrace(import.meta.url, async (span) => {
     assert(HASURA_URI, 'Valid Hasura URI graphql endpoint is required.')
     assert(HASURA_ADMIN_SECRET, 'Valid Hasura Admin Secret is required.')
     assert(PORT, 'Valid PORT # is required.')

@@ -7,17 +7,18 @@ import {
   type MetricReader
 } from '../common/index.js'
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
-import { SimpleSpanProcessor, type SpanExporter } from '@opentelemetry/sdk-trace-base'
+import { type ReadableSpan, SimpleSpanProcessor, type SpanExporter } from '@opentelemetry/sdk-trace-base'
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto'
 import { type Attributes, type Span, SpanStatusCode, trace } from '@opentelemetry/api'
 import {
-  MONGODB_CONNECTION_STRING, MONGODB_SPAN_ATTRIBUTE_FILTERS,
+  MONGODB_CONNECTION_STRING, MONGODB_TRACE_FILTERS,
   MONGODB_TO_CONSOLE,
   OTEL_EXPORTER_OTLP_ENDPOINT,
   OTEL_SERVICE_NAME
 } from './config.js'
 import { MongoTraceExporter } from '../trace-exporters/mongodb-trace-exporter.js'
 import { NodeSDK } from '@opentelemetry/sdk-node'
+import _ from 'lodash'
 
 const spanProcessors = [new SimpleSpanProcessor(new ConsoleSpanExporter() as SpanExporter) as any]
 const consoleMetricExporter = new ConsoleMetricExporter()
@@ -29,19 +30,58 @@ if (OTEL_EXPORTER_OTLP_ENDPOINT) {
 const exporter = oltpMetricExports ?? consoleMetricExporter
 
 if (MONGODB_TO_CONSOLE || MONGODB_CONNECTION_STRING) {
-  const spanFilters = (MONGODB_SPAN_ATTRIBUTE_FILTERS || '').split(',').map(i => {
-    const [name, value] = i.split(':')
-    return { name, value }
+  const spanFilters = (MONGODB_TRACE_FILTERS || '').split(',').map(i => {
+    const [, name, op, value] = [...i.match(/([A-Za-z0-9._-]+)(=|<>|>|<|=>|=<)(.*)/) || []]
+    if (_.isNumber(value)) {
+      return { name, op, value: parseFloat(value) }
+    }
+    return { name, op, value }
   })
-  const matchSpanAttributeNameAndValue = (attributes: Attributes): boolean => {
-    return Object.entries(attributes).reduce((acc, [name, value]) => {
-      return acc && spanFilters.findIndex(i => i.name === name && i.value === value) === -1
-    }, true)
+  const matchSpanNameAndValue = (span: ReadableSpan): boolean => {
+    for (const entry of spanFilters) {
+      const { name, op, value } = entry
+      const realValue: string | number | undefined = _.get(span, name)
+      if (realValue) {
+        switch (op) {
+          case '=':
+            if (value === realValue) {
+              return true
+            }
+            break
+          case '<>':
+            if (value !== realValue) {
+              return true
+            }
+            break
+          case '>':
+            if (value > realValue) {
+              return true
+            }
+            break
+          case '<':
+            if (value < realValue) {
+              return true
+            }
+            break
+          case '>=':
+            if (value >= realValue) {
+              return true
+            }
+            break
+          case '<=':
+            if (value <= realValue) {
+              return true
+            }
+            break
+        }
+      }
+    }
+    return false
   }
   const mongodbTraceExporter = new MongoTraceExporter({
     connectionString: MONGODB_CONNECTION_STRING,
     toConsole: MONGODB_TO_CONSOLE === 'true',
-    filter: (span) => !!span.attributes.directiveName && matchSpanAttributeNameAndValue(span.attributes)
+    filter: matchSpanNameAndValue
   })
   const mongoSpanProcessor = new SimpleSpanProcessor(mongodbTraceExporter)
   spanProcessors.push(mongoSpanProcessor)

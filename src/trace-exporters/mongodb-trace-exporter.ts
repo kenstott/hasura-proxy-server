@@ -41,8 +41,8 @@ export class MongoTraceExporter implements SpanExporter {
     if (connectionString) {
       this.db = new MongoClient(connectionString)
     }
-    this.filter = this.filter || filter
-    this.rewriter = this.rewriter || rewriter
+    this.filter = filter || this.filter
+    this.rewriter = rewriter || this.rewriter
     this.omitFields = MongoTraceExporter._defaultOmitFields || omitFields
   }
 
@@ -52,11 +52,11 @@ export class MongoTraceExporter implements SpanExporter {
     })
 
     if (this.db !== undefined && documents.length) {
-      const directiveNames = [...new Set(documents.map(i => i.attributes?.directiveName ?? ''))] as string[]
+      const directiveNames = [...new Set(documents.map(i => i.attributes?.directiveName ?? 'other'))] as string[]
 
       for (const directiveName of directiveNames) {
         const collection = this.db.db().collection(directiveName)
-        collection.insertMany(documents.map(i => _.omit(i, this.omitFields)).filter(i => i.attributes?.directiveName === directiveName)).then(() => {
+        collection.insertMany(documents.map(i => _.omit(i, this.omitFields)).filter(i => i.attributes?.directiveName === directiveName || (!i.attributes?.directiveName && directiveName === 'other'))).then(() => {
           if (directiveName === directiveNames[directiveNames.length - 1]) {
             resultCallback({ code: ExportResultCode.SUCCESS })
           }

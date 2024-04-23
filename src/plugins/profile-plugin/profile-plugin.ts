@@ -41,6 +41,7 @@ export const profilePlugin = plugin({
     span?.setAttributes(ctxArgs)
 
     const profiling = profileData(singleResult.data)
+    span?.setAttributes({ extensionJson: JSON.stringify(profiling) })
     try {
       // Add your new data into the extensions - OR - augment the original data
       addToExtensions(singleResult, { profiling })

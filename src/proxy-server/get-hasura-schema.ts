@@ -25,7 +25,7 @@ interface SdlResponse {
  * @param uri {string}
  */
 export const getHasuraSchema = async (adminSecret: string, uri: string): Promise<GraphQLSchema> => {
-  return startActiveTrace(import.meta.url, async () => {
+  return await startActiveTrace(import.meta.url, async () => {
     const response = await fetch(uri, {
       method: 'POST',
       headers: { 'X-Hasura-Admin-Secret': adminSecret },

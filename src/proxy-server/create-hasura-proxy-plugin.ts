@@ -8,6 +8,7 @@ import {
   visit
 } from '../common/index.js'
 import { startActiveTrace } from './telemetry'
+import { type DirectiveNode, type StringValueNode } from 'graphql'
 
 /**
  * @description An Apollo Server plugin that proxies to a remote Hasura GraphQL Engine.
@@ -16,7 +17,7 @@ import { startActiveTrace } from './telemetry'
  * @param hasuraUri {string} The URI of the remote server should
  */
 export const createHasuraProxyPlugin = async (directiveName: string[], hasuraUri: string): Promise<HasuraPlugin> => {
-  return startActiveTrace(import.meta.url, async () => {
+  return await startActiveTrace(import.meta.url, async () => {
     const plainDirectiveNames = directiveName.map(i => {
       const matches = i.replace(/\n/g, ' ').trim().match(/^(.+?(?=\())(\(.*\))$/)
       if (matches === null) {
@@ -30,7 +31,7 @@ export const createHasuraProxyPlugin = async (directiveName: string[], hasuraUri
       async requestDidStart () {
         return {
           async responseForOperation (requestContext) {
-            return startActiveTrace('response-for-operation', async (span) => {
+            return await startActiveTrace('response-for-operation', async (span) => {
               const {
                 http,
                 query,
@@ -54,9 +55,13 @@ export const createHasuraProxyPlugin = async (directiveName: string[], hasuraUri
               }
               span?.setAttributes({ query })
               const ast = parse(query)
+              const retainDirective: DirectiveNode[] = []
               const hasuraAST = visit(ast, {
                 Directive: {
                   leave: (node) => {
+                    if (node.name.value === 'retain') {
+                      retainDirective.push(node)
+                    }
                     if (plainDirectiveNames.includes(node.name.value)) {
                       return null
                     }
@@ -64,6 +69,13 @@ export const createHasuraProxyPlugin = async (directiveName: string[], hasuraUri
                   }
                 }
               })
+              const queryID = retainDirective[0]?.arguments?.find((i) => i.name.value === 'queryID')
+              const collection = retainDirective[0]?.arguments?.find((i) => i.name.value === 'collection')
+              if (queryID?.value && !requestContext.contextValue.isSchemaQuery) {
+                requestContext.contextValue.queryID = (queryID.value as StringValueNode).value
+                requestContext.contextValue.queryCollection = (collection?.value as StringValueNode)?.value
+                return null
+              }
               const modifiedQuery = print(hasuraAST)
               headersMap?.delete('content-length')
               const headers = [...headersMap ?? []]

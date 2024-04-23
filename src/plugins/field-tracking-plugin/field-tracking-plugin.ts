@@ -35,7 +35,7 @@ export const fieldTrackingPlugin = plugin({
       if (singleResult.data) {
         const { list: info } = getFieldList(gql(query), schema)
         for (const fieldTracker of info ?? []) {
-          startActiveTrace(import.meta.url, async (span) => {
+          await startActiveTrace(import.meta.url, async (span) => {
             span?.setAttributes({
               directiveName: 'field-tracking',
               query,

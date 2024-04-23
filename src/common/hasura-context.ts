@@ -3,4 +3,7 @@ export interface HasuraContext {
   userID?: string | string[]
   cwd: string
   stopProcessing: boolean
+  queryID?: string
+  queryCollection?: string
+  revisedOperation?: any
 }

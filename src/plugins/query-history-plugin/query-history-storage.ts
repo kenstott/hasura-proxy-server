@@ -1,8 +1,7 @@
-import { MongoClient } from 'mongodb'
-import { type TypeFieldPair } from '../helpers/get-type-field-pairs'
-import { type ObjMap } from '../helpers/index.js'
+import { MongoClient, type WithId } from 'mongodb'
+import { type TypeFieldPair, type ObjMap } from '../helpers/index.js'
 import _ from 'lodash'
-import { type VariableValues } from '../../plugin-builder'
+import { type VariableValues } from '../../plugin-builder/index.js'
 
 interface StoreQueryResultsOptions {
   operationName: string
@@ -14,7 +13,21 @@ interface StoreQueryResultsOptions {
   ttlDays?: number
   variables: VariableValues
   granularity?: Granularity
+  root: string
   dataset: Array<ObjMap<unknown>>
+  queryID: string
+}
+
+interface HistoricalRecordMetadata extends Record<string, unknown> {
+  fields: Array<{ field: string, type: string }>
+  operationName: string
+  query: string
+  root: string
+}
+interface HistoricalRecord extends Record<string, unknown> {
+  _timestamp: Date
+  metadata: HistoricalRecordMetadata
+  queryID: string
 }
 
 export class QueryHistoryStorage {
@@ -26,6 +39,15 @@ export class QueryHistoryStorage {
     }
   }
 
+  retrieveQueryResults = async (queryID: string, collection?: string): Promise<Record<string, Array<Record<string, unknown>>>> => {
+    const db = (await this.db).db()
+    collection = collection ?? 'QueryHistory'
+    const results = await db.collection(collection).find({ queryID }, { projection: { _timestamp: 0, queryID: 0, _id: 0 } }).toArray() as Array<WithId<HistoricalRecord>>
+    return results.reduce((acc: Record<string, Array<Record<string, unknown>>>, record: HistoricalRecord) =>
+      ({ ...acc, [record.metadata.root]: [...(acc[record.metadata.root] || []), _.omit(record, ['metadata'])] })
+    , {} satisfies Record<string, Array<Record<string, unknown>>>)
+  }
+
   storeQueryResults = async ({
     collection,
     ttlDays,
@@ -35,19 +57,23 @@ export class QueryHistoryStorage {
     metaFields,
     granularity,
     operationName,
-    dataset
+    root,
+    dataset,
+    queryID
   }: StoreQueryResultsOptions): Promise<void> => {
     const db = (await this.db).db()
-    timeField = timeField ?? '_timestamp'
     ttlDays = ttlDays ?? 120
     collection = collection ?? 'QueryHistory'
     granularity = granularity ?? Granularity.seconds
     metaFields = metaFields ?? []
+    timeField = timeField ?? '_timestamp'
+
     const _timestamp = new Date()
     const metadata = {
       operationName,
       query,
-      fields
+      fields,
+      root
     }
     const collectionExists = await db.listCollections({ name: collection }).hasNext()
     if (!collectionExists) {
@@ -62,6 +88,7 @@ export class QueryHistoryStorage {
     }
     const timeseriesDataset = dataset.map(i => ({
       ...i,
+      queryID,
       _timestamp,
       metadata: { ...metadata, ..._.pick(i, metaFields) }
     }))

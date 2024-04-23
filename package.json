@@ -14,7 +14,7 @@
     "sample:build:plugin": "npx ncc build src/plugins/data-anomalies-plugin/data-anomalies-plugin.ts -o custom-plugins/validator --target es2020 -m && npx ncc build src/plugins/profile-plugin/profile-plugin.ts -o custom-plugins/profiler --target es2020 -m ",
     "start": "npm run node:run",
     "postinstall": "chmod +x choose.sh",
-    "docker:build:image" : "docker build -t kstott/hasura-proxy-server .",
+    "docker:build:image": "docker build -t kstott/hasura-proxy-server .",
     "docker:run": "docker compose up"
   },
   "author": "",
@@ -43,6 +43,8 @@
     "lodash": "^4.17.21",
     "mongodb": "^6.5.0",
     "python-shell": "^5.0.0",
+    "ts-deepmerge": "^7.0.0",
+    "uuid": "^9.0.1",
     "wordnet": "^2.0.0"
   },
   "type": "module",
@@ -51,6 +53,7 @@
     "@types/graphql-fields": "^1.3.9",
     "@types/lodash": "^4.17.0",
     "@types/node": "^20.12.2",
+    "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^7.5.0",
     "@vercel/ncc": "^0.38.1",
     "denoify": "^1.6.9",

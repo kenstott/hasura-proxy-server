@@ -6,12 +6,16 @@ import {
   Kind,
   type OperationDefinitionNode
 } from '../common/index.js'
-import { getDirectiveArgs, getDirectiveAttributes } from './get-directive-args'
+import { getDirectiveArgs, getDirectiveAttributes } from './get-directive-args.js'
 import { type Attributes, type Span } from '@opentelemetry/api'
-import { startActiveTrace } from '../proxy-server/telemetry'
-import { type GraphQLRequestContextDidResolveOperation, type HTTPGraphQLRequest } from '@apollo/server'
-import { addToExtensions } from './add-extensions'
-import { addToErrors } from './add-errors'
+import { startActiveTrace } from '../proxy-server/telemetry.js'
+import {
+  type GraphQLResponse,
+  type GraphQLRequestContextDidResolveOperation,
+  type GraphQLRequestContextResponseForOperation, type GraphQLRequest
+} from '@apollo/server'
+import { addToExtensions } from './add-extensions.js'
+import { addToErrors } from './add-errors.js'
 
 export type VariableValues = Record<string, any>
 
@@ -32,12 +36,13 @@ export interface OperationResolveContext {
 
 interface WillSendResponsePluginResolverOptions {
   singleResult: FormattedExecutionResult
-  http?: HTTPGraphQLRequest
+  request?: GraphQLRequest
   span?: Span
   args?: Record<string, any>
   context: OperationResolveContext
   schema: GraphQLSchema
   operation: OperationDefinitionNode
+  contextValue: HasuraContext
   userID?: string | string[]
 }
 
@@ -47,6 +52,7 @@ export interface MakeHasuraPluginOptions {
   operationDirectiveHelp?: string
   operationDirective?: string
   additionalSDL?: string
+  responseForOperationPluginResolver?: (requestContext: GraphQLRequestContextResponseForOperation<HasuraContext>) => Promise<GraphQLResponse | null>
   willSendResponsePluginResolver?: WillSendResponsePluginResolver
   didResolveOperationPluginResolver?: (requestContext: GraphQLRequestContextDidResolveOperation<HasuraContext>) => Promise<void>
   argDefaults?: Record<string, any>
@@ -63,6 +69,7 @@ export const plugin = ({
   operationDirectiveHelp,
   operationDirective,
   additionalSDL,
+  responseForOperationPluginResolver,
   didResolveOperationPluginResolver,
   willSendResponsePluginResolver,
   argDefaults
@@ -74,6 +81,12 @@ export const plugin = ({
     additionalSDL,
     async requestDidStart (_requestContext) {
       return {
+        async responseForOperation (requestContext: GraphQLRequestContextResponseForOperation<HasuraContext>): Promise<GraphQLResponse | null> {
+          if (!requestContext.contextValue.isSchemaQuery) {
+            return await responseForOperationPluginResolver?.(requestContext) ?? null
+          }
+          return null
+        },
         async didResolveOperation (context) {
           if (context.contextValue.stopProcessing) {
             return
@@ -87,6 +100,7 @@ export const plugin = ({
           if (!willSendResponsePluginResolver) {
             return
           }
+          const { request } = context
           const {
             operationName: _operationName,
             schema,
@@ -99,14 +113,15 @@ export const plugin = ({
             operation,
             response
           } = context
-          if (contextValue.isSchemaQuery || response.body.kind !== 'single' || operation?.kind !== Kind.OPERATION_DEFINITION) {
+          if (contextValue.isSchemaQuery || contextValue.queryID || response.body.kind !== 'single' || operation?.kind !== Kind.OPERATION_DEFINITION) {
             return
           }
+          const revisedOperation = contextValue.revisedOperation ?? operation
           const operationName = _operationName ?? ''
           const variables = _variables ?? {}
           await startActiveTrace(import.meta.url, async (span) => {
             if (response.body.kind === 'single') {
-              const directive = operation?.directives?.find(i => i.name.value === operationDirectiveName)
+              const directive = revisedOperation?.directives?.find(i => i.name.value === operationDirectiveName)
               if (directive !== undefined || !operationDirectiveName) {
                 const userID = http?.headers.get('x-hasura-user-id') ?? ''
                 const directiveArgs = getDirectiveAttributes(directive, argDefaults)
@@ -136,7 +151,8 @@ export const plugin = ({
                 await willSendResponsePluginResolver({
                   singleResult,
                   operation,
-                  http,
+                  request,
+                  contextValue,
                   span,
                   args,
                   context,

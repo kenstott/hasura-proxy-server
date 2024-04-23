@@ -1,9 +1,12 @@
 import { plugin } from '../../plugin-builder/index.js'
 import { Granularity, QueryHistoryStorage } from './query-history-storage.js'
 import { MONGODB_CONNECTION_STRING } from '../../proxy-server/config.js'
-import { getFieldList } from '../helpers'
+import { getFieldList } from '../helpers/index.js'
 import gql from 'graphql-tag'
 import { Kind } from '../../common/index.js'
+import { v4 as uuid } from 'uuid'
+import { type GraphQLResponse, type HTTPGraphQLHead } from '@apollo/server'
+import { op } from 'arquero'
 
 /**
  * @description Adds @retain operation directive to queries, which will
@@ -18,6 +21,8 @@ export const queryHistoryPlugin = plugin({
   operationDirective: `@retain( 
     """A MongoDB collection name to track this query. Defaults to 'QueryHistory'""" 
     collection: String = "QueryHistory", 
+    """An optional ID to retrieve subsequently retrieve results, the original ID was returned in the extensions of the original query""" 
+    queryID: String,
     """Expiration time in days for query results. Defaults to 120 days. This cannot be changed after the first creation of the collection."""
     ttlDays: Float = 120, 
     """Use a field name in your query for bucketing by time. Will default to the time of the query.""" 
@@ -51,19 +56,35 @@ export const queryHistoryPlugin = plugin({
     granularity: Granularity.seconds
   },
 
+  responseForOperationPluginResolver: async ({ request, operation, contextValue, response }) => {
+    if (contextValue.queryID && MONGODB_CONNECTION_STRING) {
+      const queryHistoryStorage = new QueryHistoryStorage(MONGODB_CONNECTION_STRING)
+      const data = await queryHistoryStorage.retrieveQueryResults(contextValue.queryID, contextValue.queryCollection)
+      return {
+        http: request.http as HTTPGraphQLHead,
+        body: {
+          kind: 'single',
+          singleResult: { data }
+        }
+      } satisfies GraphQLResponse
+    }
+    return response as GraphQLResponse
+  },
+
   // Define how to process your operation directive here...
   willSendResponsePluginResolver: async ({
     operation,
     context,
+    contextValue,
     singleResult,
     span,
     args,
     schema
   }) => {
+    operation = contextValue.revisedOperation ?? operation
     if (operation.kind !== Kind.OPERATION_DEFINITION || operation.operation !== 'query' || !MONGODB_CONNECTION_STRING) {
       return
     }
-
     const {
       args: ctxArgs,
       addToErrors,
@@ -86,10 +107,12 @@ export const queryHistoryPlugin = plugin({
       const recordCounts = {}
       const queryHistoryStorage = new QueryHistoryStorage(MONGODB_CONNECTION_STRING)
       const { list: fields } = getFieldList(gql(query), schema)
+      const queryID = uuid()
       for (const entry of Object.entries(singleResult.data ?? {})) {
-        const [key, dataset] = entry as [string, Array<Record<string, unknown>>]
+        const [root, dataset] = entry as [string, Array<Record<string, unknown>>]
         await queryHistoryStorage.storeQueryResults({
           operationName,
+          queryID,
           query,
           fields,
           collection,
@@ -98,15 +121,17 @@ export const queryHistoryPlugin = plugin({
           timeField,
           metaFields,
           granularity,
+          root,
           dataset
         })
-        recordCounts[key] = dataset.length
+        recordCounts[root] = dataset.length
       }
       addToExtensions(singleResult, {
         resultsRetained: {
           recordCounts,
           collection,
-          ttlDays
+          ttlDays,
+          queryID
         }
       })
     } catch (error) {
