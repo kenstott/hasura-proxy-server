@@ -65,7 +65,8 @@ When you run the query you will get this added to the extensions section of the 
       "ttlDays": 120,
       "replayID": "36de1116-ab59-42d4-8d47-d73844d9e84a"
     }
-  },}
+  }
+}
 ```
 
 ## Options
