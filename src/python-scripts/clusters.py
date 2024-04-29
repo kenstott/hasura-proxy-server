@@ -1,4 +1,3 @@
-# sample.py
 import base64
 import json
 import logging
@@ -10,8 +9,7 @@ from pyhasura import HasuraClient, ExportFormat
 
 def main():
     try:
-
-        hasura_client = HasuraClient()
+        hasura_client = HasuraClient(logging_=logging)
         logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
         logging.info("Loading data...")
 

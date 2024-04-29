@@ -1,6 +1,7 @@
-# data-anomalies-plugin
+# cluster-plugin
 
-This plugin is really, really simple to invoke. You just set a threshold value -.5 to .5 (suspicious to normal).
+This plugin is simple to invoke. It only has one optional parameter, clusters, which can be
+set to override automatic calculation of optimum # of clusters.
 
 It would be interesting to add the result as a value for each query root object and make it a @defer field.
 That would be the cleanest way to do it. But support for @defer with Apollo Server is not quite there
@@ -30,10 +31,10 @@ query findCarts {
 }
 ```
 
-Just add the @anomalies directive to the query like this:
+Just add the @cluster directive to the query like this:
 
 ```graphql
-query findCarts @anomalies(threshold: 0)  {
+query findCarts @cluster  {
   carts {
     user {
       name
@@ -57,50 +58,197 @@ When you run the query you will get this added to the extensions section of the 
 ```json
 {
   "extensions": {
-    "anomalies": {
+    "resultsRetained": {
+      "recordCounts": {
+        "carts": 5
+      },
+      "collection": "QueryHistory",
+      "ttlDays": 120,
+      "replayID": "9fe85077-6fc4-446b-b841-256b6f23e993"
+    },
+    "clusters": {
       "carts": [
-        {
-          "user": {
-            "name": "Sean"
+        [
+          {
+            "user": {
+              "name": "Sandeep"
+            },
+            "is_complete": true,
+            "cart_items": [
+              {
+                "quantity": 1,
+                "product": {
+                  "name": "Hasuras in The Cloud Tee",
+                  "manufacturer": {
+                    "name": "Hasura Tee Co."
+                  }
+                }
+              },
+              {
+                "quantity": 1,
+                "product": {
+                  "name": "Get Ship Done Mug",
+                  "manufacturer": {
+                    "name": "Hasura Merch Co."
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "user": {
+              "name": "Rob"
+            },
+            "is_complete": false,
+            "cart_items": [
+              {
+                "quantity": 1,
+                "product": {
+                  "name": "Hasuras in The Cloud Tee",
+                  "manufacturer": {
+                    "name": "Hasura Tee Co."
+                  }
+                }
+              },
+              {
+                "quantity": 1,
+                "product": {
+                  "name": "Get Ship Done Mug",
+                  "manufacturer": {
+                    "name": "Hasura Merch Co."
+                  }
+                }
+              },
+              {
+                "quantity": 1,
+                "product": {
+                  "name": "Sticker Sheet",
+                  "manufacturer": {
+                    "name": "Hasura Merch Co."
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        [
+          {
+            "user": {
+              "name": "Sean"
+            },
+            "is_complete": true,
+            "cart_items": [
+              {
+                "quantity": 1,
+                "product": {
+                  "name": "Sticker Sheet",
+                  "manufacturer": {
+                    "name": "Hasura Merch Co."
+                  }
+                }
+              },
+              {
+                "quantity": 2,
+                "product": {
+                  "name": "Dark Furry Logo Tee",
+                  "manufacturer": {
+                    "name": "Hasura Tee Co."
+                  }
+                }
+              },
+              {
+                "quantity": -2,
+                "product": {
+                  "name": "Dark Furry Logo Tee",
+                  "manufacturer": {
+                    "name": "Hasura Tee Co."
+                  }
+                }
+              }
+            ]
           },
-          "is_complete": true,
-          "cart_items": [
-            {
-              "quantity": 1,
-              "product": {
-                "name": "Sticker Sheet",
-                "manufacturer": {
-                  "name": "Hasura Merch Co."
-                }
-              }
+          {
+            "user": {
+              "name": "Abby"
             },
-            {
-              "quantity": 2,
-              "product": {
-                "name": "Dark Furry Logo Tee",
-                "manufacturer": {
-                  "name": "Hasura Tee Co."
+            "is_complete": false,
+            "cart_items": [
+              {
+                "quantity": 2,
+                "product": {
+                  "name": "Monogram Baseball Cap",
+                  "manufacturer": {
+                    "name": "Hasura Hat Co."
+                  }
+                }
+              },
+              {
+                "quantity": 2,
+                "product": {
+                  "name": "The Original Tee",
+                  "manufacturer": {
+                    "name": "Hasura Tee Co."
+                  }
                 }
               }
+            ]
+          },
+          {
+            "user": {
+              "name": "Marion"
             },
-            {
-              "quantity": -2,
-              "product": {
-                "name": "Dark Furry Logo Tee",
-                "manufacturer": {
-                  "name": "Hasura Tee Co."
+            "is_complete": true,
+            "cart_items": [
+              {
+                "quantity": 1,
+                "product": {
+                  "name": "Monogram Baseball Cap",
+                  "manufacturer": {
+                    "name": "Hasura Hat Co."
+                  }
+                }
+              },
+              {
+                "quantity": 1,
+                "product": {
+                  "name": "The Original Tee",
+                  "manufacturer": {
+                    "name": "Hasura Tee Co."
+                  }
+                }
+              },
+              {
+                "quantity": 2,
+                "product": {
+                  "name": "Sticker Sheet",
+                  "manufacturer": {
+                    "name": "Hasura Merch Co."
+                  }
+                }
+              },
+              {
+                "quantity": -1,
+                "product": {
+                  "name": "The Original Tee",
+                  "manufacturer": {
+                    "name": "Hasura Tee Co."
+                  }
                 }
               }
-            }
-          ],
-          "score": -0.013129718600255913,
-          "index": 0
-        }
+            ]
+          }
+        ]
       ]
     }
   }
 }
 ```
+
+You'll notice the that extensions is now an array of array of results.
+
+Each top-level array represents a cluster.
 
 ## Options
 
@@ -114,9 +262,9 @@ MongoDB connection string must be provided as an environment variable named: `MO
 @anomalies(thresold: Int!)
 ```
 
-| Name      | Type   | Purpose                                                                                     |
-|-----------|--------|---------------------------------------------------------------------------------------------|
-| threshold | Float! | This is the only required field. It should be a number from -.5 to .5 (suspicios to normal) |
+| Name    | Type | Purpose                                                         |
+|---------|-----|-----------------------------------------------------------------|
+| cluster | Int | Optionally override the optimum number of clusters calculation. |
 
 ## Traces
 
@@ -171,9 +319,5 @@ On the Typescript side we used their Arquero library to flatten and serialize in
 the Arrow File to Python. Python then used pyarrow to convert into a numpy array, compute the scores, 
 generate results in an Arrow File, and then push them back to NodeJS/Deno. 
 
-Arrow's zero-copy technology drastically reduces serialization/deserialization time, almost completely eliminating it.
-Making performance excellent.
+Arrow's zero-copy technology drastically reduces serialization/deserialization time.
 
-Beyond that, the Python process is started and kept open indefinitely while the NodeJS/Deno instance is running, and
-messaging is used to push the Arrow files back and forth. The persistently running Python engine, again dramatically
-speeds up processing, by eliminating spin-up time.
