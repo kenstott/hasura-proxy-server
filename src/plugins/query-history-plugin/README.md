@@ -1,6 +1,6 @@
 # query-history-plugin
 
-This plugin does require any parameters. You can invoke it with @retain
+This plugin does not require any parameters. You can invoke it with @retain
 
 It would be interesting to add the result as a value for each query root object and make it a @defer field.
 That would be the cleanest way to do it. But support for @defer with Apollo Server is not quite there
