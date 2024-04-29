@@ -3,6 +3,8 @@ import addFormats from 'ajv-formats'
 import { plugin } from '../../plugin-builder'
 import _ from 'lodash'
 import { Kind } from '../../common'
+import { MongoClient } from 'mongodb'
+import { MONGODB_CONNECTION_STRING } from '../../proxy-server/config'
 
 /**
  * @description Adds @validate operation directive to queries, which will
@@ -15,7 +17,17 @@ import { Kind } from '../../common'
 
 export const validatePlugin = plugin({
   // Define you operation directive here....in SDL
-  operationDirective: '@validate(jsonSchema: String!, verbose: Boolean = true, allErrors: Boolean = true, strict: Boolean = true)',
+  operationDirective: `@validate(
+  """The JSON Schema validation model to apply"""
+  jsonSchema: String, 
+  """The JSON Schema validation model name to apply. Retrieves the model from a database."""
+  jsonSchemaName: String, 
+  """Include the original result for a field that failed a JSON Schema validation rule"""
+  verbose: Boolean = true, 
+  """Do not stop after detecting the first error"""
+  allErrors: Boolean = true, 
+  """Apply strict validation of the JSON Schema validation model"""
+  strict: Boolean = true)`,
 
   // Define your arg defaults in TypeScript - to match the arg defaults in your SDL
   argDefaults: { verbose: true, allErrors: true, strict: false },
@@ -27,8 +39,14 @@ export const validatePlugin = plugin({
     }
 
     // Destructure your operation args...like this
-    const { jsonSchema, verbose, allErrors, strict } = args as ValidatePluginArgs
+    let { jsonSchema } = args as ValidatePluginArgs
+    const { jsonSchemaName, verbose, allErrors, strict } = args as ValidatePluginArgs
     const { args: ctxArgs, startActiveTrace, addToErrors, addToExtensions } = context
+    if (!jsonSchema && jsonSchemaName && MONGODB_CONNECTION_STRING) {
+      const client = new MongoClient(MONGODB_CONNECTION_STRING)
+      const collection = client.db().collection('jsonSchemaValidationModels')
+      jsonSchema = JSON.stringify(_.get(await collection.findOne({ name: jsonSchemaName }), 'schema'))
+    }
 
     span?.setAttributes(ctxArgs)
     try {
@@ -66,6 +84,7 @@ export const validatePlugin = plugin({
  */
 interface ValidatePluginArgs {
   jsonSchema: string
+  jsonSchemaName: string
   verbose: boolean
   allErrors: boolean
   strict: boolean

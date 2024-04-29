@@ -63,7 +63,7 @@ When you run the query you will get this added to the extensions section of the 
       },
       "collection": "QueryHistory",
       "ttlDays": 120,
-      "queryID": "36de1116-ab59-42d4-8d47-d73844d9e84a"
+      "replayID": "36de1116-ab59-42d4-8d47-d73844d9e84a"
     }
   },}
 ```
@@ -77,19 +77,14 @@ MongoDB connection string must be provided as an environment variable named: `MO
 
 ```graphql
 @retain(
-"""A MongoDB collection name to track this query. Defaults to 'QueryHistory'"""
 collection: String = "QueryHistory",
-"""An optional ID to retrieve subsequently retrieve results, the original ID was returned in the extensions of the original query"""
-queryID: String,
-"""Expiration time in days for query results. Defaults to 120 days. This cannot be changed after the first creation of the collection."""
+replayID: timestamp,
+replayFrom: timestamp,
+replayTo: String,
+deltaKey: String,
 ttlDays: Float = 120,
-"""Use a field name in your query for bucketing by time. Will default to the time of the query."""
 timeField: String = "_timestamp",
-"""The operation name and fields referenced are part of the metadata fields for the time collection.
-You can optionally include additional fields to add to the metadata. The metadata is used to generate the deltas and impacts storage costs.
-"""
 metaField: [String!],
-"""Defines the size of time buckets in the time series collection. SECONDS can be efficient, but waste space if that time resolution is not realistic."""
 granularity: Granularity = SECONDS
 )
 ```
@@ -100,46 +95,54 @@ granularity: Granularity = SECONDS
 | ttlDays     | Float       | Expiration time in days for query results. Defaults to 120 days. This can only be changed after the first creation of the collection through MongoDB                                                                                                                                     |
 | timeField   | String      | Use a field name in your query for bucketing by time. Will default to the time of the query.                                                                                                                                                                                             |
 | metaField   | [String!]   | The operation name and field names are by default part of the metadata fields for the time collection. You can optionally include additional fields to add to the metadata. The metadata is used to generate the deltas and your choices could impact retrieval times and storage costs. |
-| queryID     | String      | A UUID (aka queryID) is returned in the extensions when you use @retain. If you use this same value as the queryID it will replay the original query results, rather than querying the datastore                                                                                         |
+| replayID    | String      | A UUID (aka replayID) is returned in the extensions when you use @retain. If you use this same value as the replayID it will replay the original query results, rather than querying the datastore                                                                                       |
+| replayFrom  | timestamp   | An optional date time as an RFC string - to retrieve historical results based on the operation name. This defines the lower bound.                                                                                                                                                       |
+| replayTo    | timestamp   | An optional date time as an RFC string - to retrieve historical results based on the operation name. This defines the upper bound.                                                                                                                                                       |
+| deltaKey    | string      | An optional field name to be used to compute deltas when retrieving historical results using replayTo/replayFrom.                                                                                                                                                                        |
 | granularity | GRANULARITY | Defaults to "SECONDS", "MINUTES" or "HOURS" can also be used. Improves overall processing and storage if the frequency of data is similar to granularity                                                                                                                                 |
 
 ## Traces
 
 Will create traces in this format:
 
-```json
-{
-  "traceId": "613e0c408d95bbb3c7187c5738b796e4",
-  "parentId": "74001af6355a3f1a",
-  "name": "plugin.js",
-  "id": "b5934e8e11081696",
-  "kind": 0,
-  "timestamp": 1713445848197000,
-  "duration": 7419182.709,
-  "attributes": {
-    "query": "query findCarts @anomalies(threshold: 0)  {  carts {    user {      name    }    is_complete    cart_items {      quantity      product {        name        manufacturer {          name        }      }    }  }} ",
-    "userID": "123",
-    "directiveName": "anomalies",
-    "threshold": 0,
-    "operationName": "findCarts",
-    "anomalies-carts": "[{\"user\":{\"name\":\"Sean\"},\"is_complete\":true,\"cart_items\":[{\"quantity\":1,\"product\":{\"name\":\"Sticker Sheet\",\"manufacturer\":{\"name\":\"Hasura Merch Co.\"}}},{\"quantity\":2,\"product\":{\"name\":\"Dark Furry Logo Tee\",\"manufacturer\":{\"name\":\"Hasura Tee Co.\"}}},{\"quantity\":-2,\"product\":{\"name\":\"Dark Furry Logo Tee\",\"manufacturer\":{\"name\":\"Hasura Tee Co.\"}}}],\"score\":-0.013129718600255913,\"index\":0}]"
-  },
-  "status": {
-    "code": 1
-  },
-  "events": [],
-  "links": []
-}
-
+```javascript
+trace = {
+    traceId: '82dc77d71322cde021e38d60e6ff05a8',
+    parentId: '08eadddb61a763fd',
+    traceState: undefined,
+    name: 'plugin.js',
+    id: '7420deaaeeaf7b59',
+    kind: 0,
+    timestamp: 1714001433153000,
+    duration: 1119525.708,
+    attributes: {
+        query: 'query findCarts @retain  {\n' +
+            '  carts {\n' +
+            '    created_at\n' +
+            '    user {\n' +
+            '      name\n' +
+            '    }\n' +
+            '    is_complete\n' +
+            '  }\n' +
+            '}',
+        userID: '123',
+        directiveName: 'retain',
+        collection: 'QueryHistory',
+        ttlDays: 120,
+        timeField: '_timestamp',
+        metaFields: [],
+        granularity: 'SECONDS',
+        operationName: 'findCarts',
+        recordCounts: '{"carts":5}',
+        replayID: '86ced8f8-e83d-4eb8-9d0a-86073224d8a4'
+    }
 ```
-
-Note the extensions attribute. There will be a single trace for each query. Each root query will have an attribute with suspicious records in a stringified JSON.
 
 ## MongoDB Trace Log
 
-If you have setup the MongoDB trace exporter, anomalies will be recorded like this:
+If you have setup the MongoDB trace exporter, retain will be recorded like this:
 
-![Anomalies](../../../docs/images/anomalies.png)
+![Retain](../../../docs/images/retain.png)
 
 ## Related Plugins
 

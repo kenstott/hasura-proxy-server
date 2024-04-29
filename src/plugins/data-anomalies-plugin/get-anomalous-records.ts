@@ -1,6 +1,26 @@
 import { PythonShell } from 'python-shell'
 import * as aq from 'arquero'
 import { altPath, altProcess } from '../../common/index.js'
+import type { ObjMap } from '../helpers/index.js'
+import _ from 'lodash'
+import { MONGODB_CONNECTION_STRING } from '../../proxy-server/config.js'
+
+export enum ModelOutput {
+  base64 = 'BASE64',
+  selectionSet = 'SELECTION_SET',
+  operationName = 'OPERATION_NAME',
+  none = 'NONE'
+}
+
+export interface GetScoresOptions {
+  data: ObjMap<unknown>
+  threshold: number
+  modelOut?: ModelOutput
+  modelIn?: ModelOutput
+  modelInData?: string
+  selectionSetHash?: string
+  operationName?: string
+}
 
 export class GetAnomalousRecords {
   shell: PythonShell
@@ -22,30 +42,20 @@ export class GetAnomalousRecords {
     })
   }
 
-  getScores = async (dataset: Array<Record<string, unknown>>, threshold: number): Promise<Array<Record<string, unknown>>> => {
-    const arrowTable = aq.from(dataset)
-    const arrowTableAsBase64 = Buffer.from(arrowTable.toArrowBuffer()).toString('base64')
-    return await new Promise<Array<Record<string, unknown>>>((resolve, reject) => {
+  getScores = async (options: GetScoresOptions): Promise<ObjMap<unknown>> => {
+    const { data } = options
+    options.data = Object.entries(data).reduce<ObjMap<unknown>>((acc, [key, dataset]) => {
+      const cleansed = (dataset as Array<Record<string, unknown>>).map((i: Record<string, unknown>) => _.omit(i, ['_timestamp', 'replayID', '_index']))
+      return { ...acc, [key]: Buffer.from(aq.from(cleansed).toArrowBuffer()).toString('base64') }
+    }, {})
+    return await new Promise<ObjMap<unknown>>((resolve, reject) => {
       this.shell.on('message', (msg: string) => {
-        const scores = { ...JSON.parse(msg) as number[] }
-        const augmentedRecords = Object.entries(scores).reduce<Array<Record<string, unknown>>>((acc, [strIndex, score]) => {
-          if ((score as number) < threshold) {
-            const index = parseInt(strIndex)
-            acc.push({
-              ...dataset[index],
-              score,
-              index
-            })
-          }
-          return acc
-        },
-        [])
-        resolve(augmentedRecords)
+        resolve(JSON.parse(msg) as ObjMap<unknown>)
       })
       this.shell.on('error', (error) => {
         reject(error)
       })
-      this.shell.send(arrowTableAsBase64)
+      this.shell.send(JSON.stringify({ ...options, MONGODB_CONNECTION_STRING }))
     })
   }
 }

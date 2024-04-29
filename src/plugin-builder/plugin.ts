@@ -4,7 +4,8 @@ import {
   type HasuraContext,
   type HasuraPlugin,
   Kind,
-  type OperationDefinitionNode
+  type OperationDefinitionNode,
+  type DirectiveNode
 } from '../common/index.js'
 import { getDirectiveArgs, getDirectiveAttributes } from './get-directive-args.js'
 import { type Attributes, type Span } from '@opentelemetry/api'
@@ -56,6 +57,7 @@ export interface MakeHasuraPluginOptions {
   willSendResponsePluginResolver?: WillSendResponsePluginResolver
   didResolveOperationPluginResolver?: (requestContext: GraphQLRequestContextDidResolveOperation<HasuraContext>) => Promise<void>
   argDefaults?: Record<string, any>
+  useWithReplays?: boolean
 }
 
 /**
@@ -72,6 +74,7 @@ export const plugin = ({
   responseForOperationPluginResolver,
   didResolveOperationPluginResolver,
   willSendResponsePluginResolver,
+  useWithReplays,
   argDefaults
 }: MakeHasuraPluginOptions): HasuraPlugin => {
   const operationDirectiveName = operationDirective?.replace(/\n/g, ' ').trim().match(/^@(.+?(?=\())(\(.*\))$/)?.[1] ?? ''
@@ -94,10 +97,7 @@ export const plugin = ({
           await didResolveOperationPluginResolver?.(context)
         },
         async willSendResponse (context) {
-          if (context.contextValue.stopProcessing) {
-            return
-          }
-          if (!willSendResponsePluginResolver) {
+          if (context.contextValue.stopProcessing || !willSendResponsePluginResolver) {
             return
           }
           const { request } = context
@@ -113,15 +113,19 @@ export const plugin = ({
             operation,
             response
           } = context
-          if (contextValue.isSchemaQuery || contextValue.queryID || response.body.kind !== 'single' || operation?.kind !== Kind.OPERATION_DEFINITION) {
+          if (contextValue.isSchemaQuery || response.body.kind !== 'single' || operation?.kind !== Kind.OPERATION_DEFINITION) {
             return
           }
-          const revisedOperation = contextValue.revisedOperation ?? operation
-          const operationName = _operationName ?? ''
+          if (contextValue.history && !useWithReplays) {
+            return
+          }
+          const operationName = _operationName || context.operation?.name?.value || ' '
           const variables = _variables ?? {}
           await startActiveTrace(import.meta.url, async (span) => {
             if (response.body.kind === 'single') {
-              const directive = revisedOperation?.directives?.find(i => i.name.value === operationDirectiveName)
+              const directive: DirectiveNode | undefined =
+                  operation?.directives?.find((i: DirectiveNode) => i.name.value === operationDirectiveName) ||
+                  contextValue.revisedOperation?.directives?.find((i: DirectiveNode) => i.name.value === operationDirectiveName)
               if (directive !== undefined || !operationDirectiveName) {
                 const userID = http?.headers.get('x-hasura-user-id') ?? ''
                 const directiveArgs = getDirectiveAttributes(directive, argDefaults)
@@ -133,7 +137,6 @@ export const plugin = ({
                     ...directiveArgs,
                     operationName,
                     directiveName: operationDirectiveName,
-
                     query,
                     userID
                   } satisfies ArgsContext,

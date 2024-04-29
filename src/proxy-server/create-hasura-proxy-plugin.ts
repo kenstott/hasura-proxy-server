@@ -8,7 +8,8 @@ import {
   visit
 } from '../common/index.js'
 import { startActiveTrace } from './telemetry'
-import { type DirectiveNode, type StringValueNode } from 'graphql'
+import { type DirectiveNode } from 'graphql'
+import { convertValueNode } from '../plugin-builder/get-directive-args'
 
 /**
  * @description An Apollo Server plugin that proxies to a remote Hasura GraphQL Engine.
@@ -69,11 +70,18 @@ export const createHasuraProxyPlugin = async (directiveName: string[], hasuraUri
                   }
                 }
               })
-              const queryID = retainDirective[0]?.arguments?.find((i) => i.name.value === 'queryID')
-              const collection = retainDirective[0]?.arguments?.find((i) => i.name.value === 'collection')
-              if (queryID?.value && !requestContext.contextValue.isSchemaQuery) {
-                requestContext.contextValue.queryID = (queryID.value as StringValueNode).value
-                requestContext.contextValue.queryCollection = (collection?.value as StringValueNode)?.value
+              const history = {
+                clean: convertValueNode(retainDirective[0]?.arguments?.find((i) => i.name.value === 'clean')?.value),
+                deltaKey: convertValueNode(retainDirective[0]?.arguments?.find((i) => i.name.value === 'deltaKey')?.value)?.toString(),
+                timeField: convertValueNode(retainDirective[0]?.arguments?.find((i) => i.name.value === 'timeField')?.value)?.toString(),
+                replayFrom: convertValueNode(retainDirective[0]?.arguments?.find((i) => i.name.value === 'replayFrom')?.value)?.toString(),
+                replayTo: convertValueNode(retainDirective[0]?.arguments?.find((i) => i.name.value === 'replayTo')?.value)?.toString(),
+                replayID: convertValueNode(retainDirective[0]?.arguments?.find((i) => i.name.value === 'replayID')?.value)?.toString(),
+                collection: convertValueNode(retainDirective[0]?.arguments?.find((i) => i.name.value === 'collection')?.value)?.toString(),
+                operationName: operationName ?? ''
+              }
+              if ((history.replayID || history.replayFrom || history.replayTo) && operationName && !requestContext.contextValue.isSchemaQuery) {
+                requestContext.contextValue.history = history
                 return null
               }
               const modifiedQuery = print(hasuraAST)

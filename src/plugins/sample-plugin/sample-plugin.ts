@@ -5,11 +5,18 @@ import { Kind } from '../../common'
 import { processSamplePlugin } from './process-sample-plugin'
 
 export const samplePlugin = plugin({
-  operationDirective: '@sample(count: Int!, random: Boolean = false, fromEnd: Boolean = false)',
+  operationDirective: `@sample(
+  """ maximum number of records to sample from dataset """
+  count: Int!, 
+  """ if true samples random items from dataset, and overrides the sampling from start or end of dataset """
+  random: Boolean = false, 
+  """ if true samples from end of dataset, other samples from start of dataset """
+  fromEnd: Boolean = false)`,
   argDefaults: {
     random: false,
     fromEnd: false
   },
+  useWithReplays: true,
   willSendResponsePluginResolver: async ({ operation, context, singleResult, args, span }) => {
     if (operation.kind !== Kind.OPERATION_DEFINITION || operation.operation !== 'query' || !singleResult.data) {
       return

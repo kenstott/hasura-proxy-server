@@ -1,8 +1,7 @@
-import { plugin } from '../../plugin-builder'
-import * as aq from 'arquero'
-import { flatten } from 'flat'
-import { FileFormat, FileOutput, outputFile } from './output-file'
-import { Kind } from '../../common'
+import { plugin } from '../../plugin-builder/index.js'
+import { FileFormat, type FileOutput } from './output-file.js'
+import { Kind } from '../../common/index.js'
+import { generateResponse } from './generate-response.js'
 
 /**
  * @description Adds @sample operation directive to queries, which will
@@ -57,6 +56,7 @@ export const filePlugin = plugin({
   willSendResponsePluginResolver: async ({
     operation,
     context,
+    contextValue: { originalUrl, response },
     singleResult,
     args,
     span
@@ -78,41 +78,44 @@ export const filePlugin = plugin({
 
     span?.setAttributes(ctxArgs)
     try {
-      const files = {}
-      for (const entry of Object.entries(singleResult.data)) {
-        const [key, dataset] = entry
-        if (Array.isArray(dataset)) {
-          switch (format) {
-            case FileFormat.html:
-              files[key] = { csv: outputFile[output](aq.from(dataset.map(i => flatten(i))).toHTML(), format) }
-              break
-            case FileFormat.markdown:
-              files[key] = { csv: outputFile[output](aq.from(dataset.map(i => flatten(i))).toMarkdown(), format) }
-              break
-            case FileFormat.csv:
-              files[key] = { csv: outputFile[output](aq.from(dataset.map(i => flatten(i))).toCSV(), format) }
-              break
-            case FileFormat.tsv:
-              files[key] = { tsv: outputFile[output](aq.from(dataset.map(i => flatten(i))).toCSV({ delimiter: '\t' }), format) }
-              break
-            case FileFormat.json:
-              files[key] = { json: outputFile[output](JSON.stringify(dataset, null, 2), format) }
-              break
-            case FileFormat.arrow:
-              switch (output) {
-                case FileOutput.dataUri:
-                  files[key] = { arrow: outputFile[output](aq.from(dataset.map(i => flatten(i))).toArrowBuffer(), format) }
-                  break
-                default:
-                  files[key] = { arrow: outputFile[FileOutput.base64](aq.from(dataset.map(i => flatten(i))).toArrowBuffer(), format) }
-              }
-          }
-        }
-      }
+      const files = generateResponse(singleResult.data, output as FileOutput, format as FileFormat)
       addToExtensions(singleResult, { files })
     } catch (error) {
       // Trap processing errors like this...
       addToErrors(singleResult, error as Error, { code: 'PROBLEM_WITH_SAMPLING' })
+    }
+    if (originalUrl?.startsWith('/gql')) {
+      const extension = {
+        [FileFormat.csv]: 'csv',
+        [FileFormat.tsv]: 'tsv',
+        [FileFormat.html]: 'html',
+        [FileFormat.arrow]: 'arrow',
+        [FileFormat.json]: 'json',
+        [FileFormat.markdown]: 'md'
+      }
+      const mimetype = {
+        [FileFormat.csv]: 'text/csv',
+        [FileFormat.tsv]: 'text/tsv',
+        [FileFormat.html]: 'text/html',
+        [FileFormat.arrow]: 'application/x-apache-arrow',
+        [FileFormat.json]: 'application/json',
+        [FileFormat.markdown]: 'text/markdown'
+      }
+      const [key, dataset] = Object.entries(singleResult?.extensions?.files || {})[0]
+      if (format === FileFormat.arrow) {
+        const binaryData = Buffer.from(dataset[extension[format]] as string, 'base64')
+        response?.writeHead(200, {
+          'Content-Type': mimetype[format], // Set the appropriate content type
+          'Content-disposition': `attachment; filename="${key}.${extension[format]}"`, // Set the filename
+          'Content-Length': binaryData.length // Set the content length
+        })
+        response?.end(binaryData)
+      } else {
+        const utf8 = Buffer.from(dataset[extension[format]] as string, 'base64').toString('utf-8')
+        response?.setHeader('Content-Type', `${mimetype[format]}; charset=utf-8`)
+        response?.attachment(`${key}.${extension[format]}`)
+        response?.send(utf8)
+      }
     }
   }
 })
