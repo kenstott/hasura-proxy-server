@@ -1,13 +1,17 @@
 import { ApolloServer } from '@apollo/server'
-import express from 'express'
+import express, { type Request, type RequestHandler, type ErrorRequestHandler } from 'express'
 import { expressMiddleware } from '@apollo/server/express4'
-import { hasuraWrapper } from './hasura-wrapper.js'
+import { hasuraWrapper, reloadSchema } from './hasura-wrapper.js'
 import assert from 'assert'
 import { hasuraContext } from './hasura-context.js'
 import { HASURA_ADMIN_SECRET, HASURA_URI, PORT } from './config.js'
 import { type HasuraContext, type HasuraPlugin } from '../common/index.js'
-import { startActiveTrace } from './telemetry.js'
+import { spanError, spanOK, startActiveTrace } from './telemetry.js'
 import { FileFormat } from '../plugins/file-plugin/output-file.js'
+import * as http from 'http'
+import { type Span } from '@opentelemetry/api'
+import cors from 'cors'
+import { dataProducts } from '../routes/data-products.js'
 
 /**
  * @description Abstracts away all details of instantiating the Apollo Server as a Hasura Proxy.
@@ -26,17 +30,19 @@ export const startServer = async (hasuraPlugins: HasuraPlugin[]): Promise<void> 
       pluginCount: hasuraPlugins.length
     })
 
+    const uri = new URL(HASURA_URI)
+    const adminSecret = HASURA_ADMIN_SECRET
+    const port = parseInt(PORT ?? '4000')
+
     const app = express()
+    const httpServer = http.createServer(app)
+    app.use(cors())
     const server = new ApolloServer<HasuraContext>({
-      ...await hasuraWrapper({
-        uri: new URL(HASURA_URI),
-        adminSecret: HASURA_ADMIN_SECRET,
-        hasuraPlugins
-      })
+      ...await hasuraWrapper({ uri, adminSecret, hasuraPlugins, httpServer })
     })
     await server.start()
 
-    app.get('/', (req, res, next) => {
+    app.get('/', (req, res, _next) => {
       if (req.url === '/') {
         res.redirect('/graphql')
       }
@@ -51,13 +57,70 @@ export const startServer = async (hasuraPlugins: HasuraPlugin[]): Promise<void> 
         context: hasuraContext
       })(req, res, next)
     })
+    app.post('/graphql', (_req, _res, next) => {
+      next()
+    })
+    app.get('/graphql/data-products', dataProducts)
+    app.get('/reload-schema', (async (_req, res, _next) => {
+      await reloadSchema({ uri, adminSecret, hasuraPlugins, server })
+      res.json({ reloaded: true })
+    }) as RequestHandler)
     app.use('/graphql', express.json(), expressMiddleware(server, {
       context: hasuraContext
     }))
-
-    const port = parseInt(PORT ?? '4000')
-    app.listen(port, () => {
+    app.post('/metadata', express.json(), (async (req: Request, res, _next) => {
+      if (req.get('x-hasura-admin-secret') !== process.env.HASURA_ADMIN_SECRET) {
+        throw new Error('Requires valid x-hasura-admin-secret header')
+      }
+      const response = await fetch(process.env.HASURA_URI?.replace(/graphql/, 'metadata') || '', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-hasura-role': 'admin',
+          'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET || ''
+        },
+        body: JSON.stringify(req.body?.type
+          ? req.body
+          : {
+              type: 'export_metadata',
+              args: {}
+            })
+      })
+      const json = await response.json()
+      res.json(json)
+    }) as RequestHandler)
+    const errorHandler: ErrorRequestHandler = (err: { code: string }, req, res, _next) => {
+      // special case for file download requests - when apollo server is still trying
+      // to send response
+      if (req.url.includes('gql') && err.code === 'ERR_HTTP_HEADERS_SENT') {
+        res.status(200)
+      // otherwise ignore
+      } else {
+        res.status(500)
+      }
+    }
+    app.use(errorHandler)
+    httpServer.listen({ port }, () => {
       console.log(`🚀 Server listening on port ${port}`)
+      const reloadInterval = parseInt(process.env.RELOAD_SCHEMA_INTERVAL_MS || '0')
+      if (reloadInterval) {
+        const reload = async (): Promise<void> => {
+          await startActiveTrace('reload-hasura-schema', async (span: Span) => {
+            try {
+              await reloadSchema({ uri, adminSecret, hasuraPlugins, server })
+            } catch (error) {
+              spanError(span, (error as Error))
+            } finally {
+              spanOK(span)
+            }
+          })
+        }
+        setInterval(() => {
+          void (async () => {
+            await reload()
+          })()
+        }, reloadInterval)
+      }
     })
   })
 }

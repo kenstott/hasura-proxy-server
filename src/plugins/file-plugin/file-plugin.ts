@@ -56,7 +56,7 @@ export const filePlugin = plugin({
   willSendResponsePluginResolver: async ({
     operation,
     context,
-    contextValue: { originalUrl, response },
+    contextValue,
     singleResult,
     args,
     span
@@ -64,6 +64,8 @@ export const filePlugin = plugin({
     if (operation.kind !== Kind.OPERATION_DEFINITION || operation.operation !== 'query' || !singleResult.data) {
       return
     }
+
+    const { originalUrl, response } = contextValue
 
     // Destructure your operation args...like this
     const {
@@ -78,6 +80,10 @@ export const filePlugin = plugin({
 
     span?.setAttributes(ctxArgs)
     try {
+      if (format === FileFormat.json) {
+        response?.json(singleResult)
+        return
+      }
       const files = generateResponse(singleResult.data, output as FileOutput, format as FileFormat)
       addToExtensions(singleResult, { files })
     } catch (error) {
@@ -85,6 +91,7 @@ export const filePlugin = plugin({
       addToErrors(singleResult, error as Error, { code: 'PROBLEM_WITH_SAMPLING' })
     }
     if (originalUrl?.startsWith('/gql')) {
+      contextValue.stopProcessing = true
       const extension = {
         [FileFormat.csv]: 'csv',
         [FileFormat.tsv]: 'tsv',
@@ -97,7 +104,7 @@ export const filePlugin = plugin({
         [FileFormat.csv]: 'text/csv',
         [FileFormat.tsv]: 'text/tsv',
         [FileFormat.html]: 'text/html',
-        [FileFormat.arrow]: 'application/x-apache-arrow',
+        [FileFormat.arrow]: 'application/vnd.apache.arrow.file',
         [FileFormat.json]: 'application/json',
         [FileFormat.markdown]: 'text/markdown'
       }

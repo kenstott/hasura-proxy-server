@@ -47,7 +47,13 @@ const analyzeStrings = (table: aq.internal.ColumnTable): ColumnAnalysis => {
       ...acc,
       [i.value]: i.count
     }), {})
-    return { unique, counts, stats }
+    const dups = Object.entries(counts).reduce((acc, [name, count]) => {
+      if (count > 1) {
+        acc[name] = count
+      }
+      return acc
+    }, {})
+    return { unique, dups, stats }
   }
   return { unique }
 }
@@ -55,8 +61,8 @@ const analyzeNumbers = (table: aq.internal.ColumnTable): ColumnAnalysis => {
   const unique = aq.agg(table, op.distinct('value')) === table.numRows()
   if (!unique) {
     const stats = table.rollup(statOps('value')).object() as Stats
-    const quartiles = table.rollup(quantiles('value', [0.25, 0.50, 0.75])).object() as Record<string, number>
-    const deciles = table.rollup(quantiles('value', [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])).object() as Record<string, number>
+    const quartiles = table.rollup(quantiles('value', [0.25, 0.50, 0.75, 1.00])).object() as Record<string, number>
+    const deciles = table.rollup(quantiles('value', [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])).object() as Record<string, number>
     return { unique, stats, quartiles, deciles }
   }
   return { unique }

@@ -29,7 +29,7 @@ export const namingStandardsPlugin = plugin({
     }
     const opName = operationName ?? operation.name?.value
     if (opName) {
-      const words = changeCase.sentenceCase(opName).split(' ').map(i => i.toLowerCase())
+      let words = changeCase.sentenceCase(opName).split(' ').map(i => i.toLowerCase())
       const camelCaseOperationName = changeCase.camelCase(words.join(' '))
       if (words.length < 2) {
         contextValue.stopProcessing = true
@@ -53,6 +53,7 @@ export const namingStandardsPlugin = plugin({
       }
       const operationNameTest = camelCaseOperationName.slice(words[0].length)
       const matchedObjectTypes = Object.keys(schema.getTypeMap()).filter(i => operationNameTest.toLowerCase().startsWith(changeCase.camelCase(i).toLowerCase()))
+      words = words.slice(1)
       if (matchedObjectTypes.length === 0) {
         contextValue.stopProcessing = true
         throw new GraphQLError(`Query operation names are required. and must be in the form <verb><object-type><optional noun/adjective list>. "${operationNameTest}" does not start with a known Object Type.`, {
@@ -63,7 +64,9 @@ export const namingStandardsPlugin = plugin({
         })
       }
       const matchedObjectType = matchedObjectTypes.sort((a, b) => b.length - a.length)[0]
-      const adjectiveTest = operationNameTest.slice(matchedObjectType.length)
+      const wordsInMatchedObjectType = changeCase.sentenceCase(matchedObjectType).split(' ').length
+      words = words.slice(wordsInMatchedObjectType)
+      const adjectiveTest = changeCase.camelCase(words.join(' '))
       if (adjectiveTest) {
         const adjectiveList = changeCase.sentenceCase(adjectiveTest).split(' ')
         for (const adjective of adjectiveList) {

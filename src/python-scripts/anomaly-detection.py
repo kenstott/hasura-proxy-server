@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import sys
+import pprint
 
 import pyarrow as pa
 from pyhasura import HasuraClient
@@ -13,7 +14,7 @@ def main():
 
         hasura_client = HasuraClient(logging_=logging)
         logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-        logging.info("Loading data...")
+        logging.error("Loading data...")
 
         # Read the string from stdin
         # in form of { threshold: number, data: { [dataset_name]: <base64 encoded arrow table IPC> } }
@@ -28,12 +29,12 @@ def main():
         os.environ['MONGODB_CONNECTION_STRING'] = request.get('MONGODB_CONNECTION_STRING')
         if threshold is None:
             threshold = 0
-        logging.info("Default threshold: 0")
+        logging.error("Default threshold: 0")
 
         if data is None:
             raise Exception("No data provided")
 
-        logging.info(f"Analyzing: {','.join(list(data.keys()))}")
+        logging.error(f"Analyzing: {','.join(list(data.keys()))}")
 
         # Convert arrow tables to JSON arrays
         for key, value in data.items():

@@ -40,7 +40,7 @@ export const profilePlugin = plugin({
     } = context
     span?.setAttributes(ctxArgs)
 
-    const profiling = profileData(singleResult.data)
+    const profiling = await profileData(singleResult.data)
     span?.setAttributes({ extensionJson: JSON.stringify(profiling) })
     try {
       // Add your new data into the extensions - OR - augment the original data

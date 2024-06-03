@@ -1,26 +1,25 @@
 import { flatten } from 'flat'
-import type { ObjMap, ValueObservation } from '../helpers/index.js'
-import { getKeyMap } from './get-key-map'
+import type { ObjMap } from '../helpers/index.js'
 import * as aq from 'arquero'
+import _ from 'lodash'
 
-type ColumnTable = aq.internal.ColumnTable
-
-export const createNarrowTable = (data: ObjMap<unknown>, keyMap: Map<[string, string], string>): ColumnTable => {
+export const createNarrowTable = async (data: ObjMap<unknown>, keyMap: Map<[string, string], string>): Promise<Record<string, ColumnTable>> => {
   const flattened = Object.entries(data)
     .filter(([, dataset]) => Array.isArray(dataset))
     .reduce<Record<string, Array<Record<string, unknown>>>>((acc, [key, dataset]) =>
     ({ ...acc, [key]: (dataset as Array<Record<string, unknown>>).map(i => flatten(i)) }), {})
-  const narrow = (datasetKey: string, dataset: Array<Record<string, unknown>>): ValueObservation[] => {
-    return dataset.reduce<ValueObservation[]>((acc, record, row) => {
-      const observations = Object.entries(record).map(([originalColumnKey, value]) => {
-        const columnKey = getKeyMap(keyMap, datasetKey, originalColumnKey)
-        return { datasetKey, row, columnKey, value }
-      })
-      return [...acc, ...observations]
-    }, [])
+
+  const narrow = (datasetKey: string, dataset: Array<Record<string, unknown>>): ColumnTable => {
+    const keyList = dataset.map(i => Object.entries(i)
+      .filter(([n, v]) => !Array.isArray(v) || v.length !== 0).map(([k, _]) => k))
+    const keys = [...new Set(_.flatten(keyList))]
+    const wideTable = aq.from(dataset, keys)
+    return wideTable
+      .fold(keys, { as: ['key', 'value'] }).derive(({
+        normalizedKey: (d: Record<string, unknown>) => aq.op.replace(d.key, /\.[0-9.]+/g, '.')
+      }))
   }
-  const narrowed = Object.entries(flattened).reduce((acc, [key, dataset]) => {
-    return [...acc, ...narrow(key, dataset)]
-  }, [])
-  return aq.from(narrowed)
+  return Object.entries(flattened).reduce<Record<string, ColumnTable>>((acc, [key, dataset]) => {
+    return { ...acc, [key]: narrow(key, dataset) }
+  }, {})
 }

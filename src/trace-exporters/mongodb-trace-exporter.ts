@@ -2,7 +2,7 @@ import { type ReadableSpan, type SpanExporter } from '@opentelemetry/sdk-trace-b
 import { type ExportResult, ExportResultCode } from '../common/problem-imports.js'
 import { MongoClient } from 'mongodb'
 import _ from 'lodash'
-
+import { stringify } from 'flatted'
 type MongoDBSpan = ReadableSpan & { traceId: string, spanId: string, isRemote?: boolean, traceFlags: number, timestamp: Date }
 interface MongoDbTraceExporterOptions {
   connectionString?: string
@@ -67,7 +67,7 @@ export class MongoTraceExporter implements SpanExporter {
     }
     if (this.toConsole && documents.length) {
       for (const document of documents) {
-        console.info(JSON.stringify(document, null, 2))
+        console.info(stringify(document, undefined, 2))
       }
       resultCallback({ code: ExportResultCode.SUCCESS })
     }

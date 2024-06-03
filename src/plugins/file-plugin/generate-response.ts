@@ -2,7 +2,13 @@ import { FileFormat, FileOutput, outputFile } from './output-file.js'
 import * as aq from 'arquero'
 import { flatten } from 'flat'
 import { type ObjMap } from '../helpers/index.js'
+import _ from 'lodash'
 
+export const flattenToTable = (dataset: Array<Record<string, unknown>>) => {
+  dataset = dataset.map(i => flatten(i))
+  const names = [...new Set(_.flatten(dataset.map(i => Object.keys(i))))]
+  return aq.from(dataset, names)
+}
 export const generateResponse = (data: ObjMap<unknown>, output: FileOutput, format: FileFormat): ObjMap<unknown> => {
   const files = {}
   for (const entry of Object.entries(data)) {
@@ -10,16 +16,16 @@ export const generateResponse = (data: ObjMap<unknown>, output: FileOutput, form
     if (Array.isArray(dataset)) {
       switch (format) {
         case FileFormat.html:
-          files[key] = { html: outputFile[output](aq.from(dataset.map(i => flatten(i))).toHTML(), format) }
+          files[key] = { html: outputFile[output](flattenToTable(dataset).toHTML(), format) }
           break
         case FileFormat.markdown:
-          files[key] = { md: outputFile[output](aq.from(dataset.map(i => flatten(i))).toMarkdown(), format) }
+          files[key] = { md: outputFile[output](flattenToTable(dataset).toMarkdown(), format) }
           break
         case FileFormat.csv:
-          files[key] = { csv: outputFile[output](aq.from(dataset.map(i => flatten(i))).toCSV(), format) }
+          files[key] = { csv: outputFile[output](flattenToTable(dataset).toCSV(), format) }
           break
         case FileFormat.tsv:
-          files[key] = { tsv: outputFile[output](aq.from(dataset.map(i => flatten(i))).toCSV({ delimiter: '\t' }), format) }
+          files[key] = { tsv: outputFile[output](flattenToTable(dataset).toCSV({ delimiter: '\t' }), format) }
           break
         case FileFormat.json:
           files[key] = { json: outputFile[output](JSON.stringify(dataset, null, 2), format) }
@@ -27,10 +33,10 @@ export const generateResponse = (data: ObjMap<unknown>, output: FileOutput, form
         case FileFormat.arrow:
           switch (output) {
             case FileOutput.dataUri:
-              files[key] = { arrow: outputFile[output](aq.from(dataset.map(i => flatten(i))).toArrowBuffer(), format) }
+              files[key] = { arrow: outputFile[output](flattenToTable(dataset).toArrowBuffer(), format) }
               break
             default:
-              files[key] = { arrow: outputFile[FileOutput.base64](aq.from(dataset.map(i => flatten(i))).toArrowBuffer(), format) }
+              files[key] = { arrow: outputFile[FileOutput.base64](flattenToTable(dataset).toArrowBuffer(), format) }
           }
       }
     }

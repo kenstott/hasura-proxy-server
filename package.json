@@ -15,7 +15,8 @@
     "start": "npm run node:run",
     "postinstall": "chmod +x choose.sh",
     "docker:build:image": "docker build -t kstott/hasura-proxy-server .",
-    "docker:run": "docker compose up"
+    "docker:run": "docker compose up",
+    "initialize-models": "./.venv/bin/python ./src/python-scripts/initialize-models.py"
   },
   "author": "",
   "license": "ISC",
@@ -23,6 +24,7 @@
     "@apollo/server": "^4.10.2",
     "@graphql-tools/schema": "^10.0.3",
     "@graphql-tools/utils": "^10.1.2",
+    "@json2csv/node": "^7.0.6",
     "@opentelemetry/api": "^1.8.0",
     "@opentelemetry/auto-instrumentations-node": "^0.43.0",
     "@opentelemetry/exporter-metrics-otlp-proto": "^0.49.1",
@@ -33,6 +35,7 @@
     "ajv-formats": "^3.0.1",
     "arquero": "^5.4.0",
     "change-case": "^5.4.4",
+    "cors": "^2.8.5",
     "dayjs": "^1.11.10",
     "deep-diff": "^1.0.2",
     "dotenv": "^16.4.5",
@@ -51,6 +54,7 @@
   },
   "type": "module",
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/dataframe-js": "^1.4.3",
     "@types/deep-diff": "^1.0.5",
     "@types/graphql-fields": "^1.3.9",

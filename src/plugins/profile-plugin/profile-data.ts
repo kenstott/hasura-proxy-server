@@ -4,25 +4,28 @@ import * as aq from 'arquero'
 import { getScalarType } from './get-scalar-type.js'
 import { analyze } from './create-stats.js'
 
-export const profileData = (data: ObjMap<unknown>): Analysis => {
+export const profileData = async (data: ObjMap<unknown>): Promise<Analysis> => {
   const keyMap = new Map<[string, string], string>()
-  const table = createNarrowTable(data, keyMap)
-  const validValues = table
-    .filter((d: ValueObservation) => d.value !== null && d.value !== undefined && d.value !== '')
-    .filter(aq.escape((d: ValueObservation) => typeof d.value !== 'number' || !isNaN(d.value)))
+  const tables = await createNarrowTable(data, keyMap)
   const typeMap = new Map<[string, string], ScalarType>()
-  const keys = new Set([...keyMap.entries()].map(([[datasetKey], columnKey]) => `${datasetKey}:${columnKey}`))
-  for (const entry of keys) {
-    const [datasetKey, columnKey] = entry.split(':')
-    const values = validValues.filter(aq.escape((d: ValueObservation) => d.datasetKey === datasetKey && d.columnKey === columnKey)).array('value')
-    const scalarType = getScalarType(values?.[0] ?? undefined)
-    typeMap.set([datasetKey, columnKey], scalarType)
+  const keysMap = Object.entries(tables)
+    .map(([name, table]) =>
+      [
+        name,
+        table.select('normalizedKey').dedupe('normalizedKey').objects().map((k: Record<string, string>) => k.normalizedKey)
+      ] as [string, string[]])
+  for (const [name, keys] of keysMap) {
+    for (const key of keys) {
+      const value = tables[name].filter(aq.escape((d: Record<string, unknown>) => d.normalizedKey === key && d.value !== undefined)).get('value', 0)
+      const scalarType = getScalarType(value || undefined)
+      typeMap.set([name, key], scalarType)
+    }
   }
   return [...typeMap.entries()].reduce<Analysis>((acc, [[datasetKey, columnKey], scalarType]): Analysis => {
     if (!acc[datasetKey]) {
       acc[datasetKey] = {}
     }
-    acc[datasetKey][columnKey] = analyze[scalarType]?.(table.filter(aq.escape((d: ValueObservation) => d.datasetKey === datasetKey && d.columnKey === columnKey)))
+    acc[datasetKey][columnKey] = analyze[scalarType]?.(tables[datasetKey].filter(aq.escape((d: ValueObservation) => d.normalizedKey === columnKey)))
     return acc
   }, {})
 }

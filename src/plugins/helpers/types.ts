@@ -9,9 +9,8 @@ export enum ScalarType {
 }
 
 export interface ValueObservation {
-  datasetKey: string
-  row: number
-  columnKey: string
+  key: string
+  normalizedKey: string
   value: any
 }
 
@@ -29,10 +28,11 @@ export interface Stats {
 
 export interface ColumnAnalysis {
   unique?: boolean
-  counts?: Record<string, number>
+  dups?: Record<string, number>
   stats?: Stats
   quartiles?: Record<string, number>
   deciles?: Record<string, number>
+  counts?: number | Record<string, number>
 }
 
 export type Analysis = Record<string, Record<string, ColumnAnalysis>>

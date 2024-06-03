@@ -120,20 +120,22 @@ export const queryHistoryPlugin = plugin({
       const replayID = uuid()
       for (const entry of Object.entries(singleResult.data ?? {})) {
         const [root, dataset] = entry as [string, Array<Record<string, unknown>>]
-        await queryHistoryStorage.storeQueryResults({
-          operationName,
-          replayID,
-          query,
-          fields,
-          collection,
-          variables,
-          ttlDays,
-          timeField,
-          metaFields,
-          granularity,
-          root,
-          dataset
-        })
+        if (dataset?.length) {
+          await queryHistoryStorage.storeQueryResults({
+            operationName,
+            replayID,
+            query,
+            fields,
+            collection,
+            variables,
+            ttlDays,
+            timeField,
+            metaFields,
+            granularity,
+            root,
+            dataset
+          })
+        }
         recordCounts[root] = dataset.length
       }
       span?.setAttributes({

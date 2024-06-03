@@ -49,14 +49,6 @@ export const autoDirectivePlugin = plugin({
           Directive: (node) => {
             for (const o of oldDirectives) {
               if (o.name.value === node.name.value) {
-                // if (o.arguments && node.arguments && o.arguments.length === node.arguments.length) {
-                //   for (const a of o.arguments) {
-                //     const aa = node.arguments.find(i => i.name.value === a.name.value)
-                //     if (aa && convertValue(aa.value) === convertValue(a.value)) {
-                //       return null
-                //     }
-                //   }
-                // }
                 return null
               }
             }
@@ -64,6 +56,7 @@ export const autoDirectivePlugin = plugin({
           }
         })
         requestContext.contextValue.revisedOperation = parse(print(finalRevised)).definitions[0]
+        delete process.env.TEMP_AUTO_DIRECTIVES
       }
     } catch {
       // ignore
