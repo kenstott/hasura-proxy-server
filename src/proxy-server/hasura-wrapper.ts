@@ -8,6 +8,8 @@ import type * as http from 'http'
 import { ApolloServer, type ApolloServerPlugin } from '@apollo/server'
 import assert from 'assert'
 import _ from 'lodash'
+import { generateProtoFromSdl } from '../grpc/generate-proto-from-sdl'
+import * as fs from 'fs'
 
 interface HasuraWrapperOptions {
   uri: URL
@@ -38,6 +40,7 @@ export const hasuraWrapper = async ({ uri, adminSecret, hasuraPlugins, httpServe
   assert(httpServer)
   return await startActiveTrace(import.meta.url, async (span) => {
     const schema = await createSchema({ uri, adminSecret, hasuraPlugins, httpServer })
+    fs.writeFileSync('./proto/graphql.proto', generateProtoFromSdl(schema))
     const hasuraProxyPlugin = await createHasuraProxyPlugin(hasuraPlugins.map(i => i.operationDirective ?? '').filter(Boolean), uri.toString())
     const plugins = [
       ApolloServerPluginDrainHttpServer({ httpServer }),

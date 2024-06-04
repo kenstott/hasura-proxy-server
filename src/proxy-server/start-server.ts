@@ -1,5 +1,5 @@
 import { ApolloServer } from '@apollo/server'
-import express, { type Request, type RequestHandler, type ErrorRequestHandler } from 'express'
+import express, { type Request, type RequestHandler, type ErrorRequestHandler, type Express } from 'express'
 import { expressMiddleware } from '@apollo/server/express4'
 import { hasuraWrapper, reloadSchema } from './hasura-wrapper.js'
 import assert from 'assert'
@@ -18,8 +18,8 @@ import { dataProducts } from '../routes/data-products.js'
  * @param hasuraPlugins {HasuraPlugin[]} A collection of Hasura Plugins you want to apply to the results of data
  * retrieved from the call the HGE.
  */
-export const startServer = async (hasuraPlugins: HasuraPlugin[]): Promise<void> => {
-  await startActiveTrace(import.meta.url, async (span) => {
+export const startServer = async (hasuraPlugins: HasuraPlugin[]) => {
+  return await startActiveTrace(import.meta.url, async (span) => {
     assert(HASURA_URI, 'Valid Hasura URI graphql endpoint is required.')
     assert(HASURA_ADMIN_SECRET, 'Valid Hasura Admin Secret is required.')
     assert(PORT, 'Valid PORT # is required.')
@@ -66,6 +66,9 @@ export const startServer = async (hasuraPlugins: HasuraPlugin[]): Promise<void> 
       res.json({ reloaded: true })
     }) as RequestHandler)
     app.use('/graphql', express.json(), expressMiddleware(server, {
+      context: hasuraContext
+    }))
+    app.use('/graphql-internal', expressMiddleware(server, {
       context: hasuraContext
     }))
     app.post('/metadata', express.json(), (async (req: Request, res, _next) => {
@@ -122,5 +125,6 @@ export const startServer = async (hasuraPlugins: HasuraPlugin[]): Promise<void> 
         }, reloadInterval)
       }
     })
+    return app
   })
 }

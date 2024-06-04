@@ -1,4 +1,5 @@
 import { startServer } from './start-server.js'
+import { startServer as startGRPCServer } from '../grpc/start-grpc-server'
 import { PLUGINS } from './config.js'
 import { altPath, altProcess, type HasuraPlugin } from '../common/index.js'
 import { createRequire } from 'module'
@@ -15,4 +16,5 @@ for (const modulePath of (PLUGINS ?? '').split(',').filter(Boolean)) {
   const p = await import(altPath.resolve(altProcess.cwd(), modulePath))
   plugins.push(p.default as HasuraPlugin)
 }
-await startServer(plugins)
+const app = await startServer(plugins)
+await startGRPCServer(app)

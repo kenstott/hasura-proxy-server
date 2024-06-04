@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+import "google/protobuf/struct.proto";
+
+package graphql;
+
+<%= messages %>
+
+message GraphQLRequest {
+  string operationName = 1;
+  string query = 2;
+  google.protobuf.Struct variables = 3;
+  string variablesString = 4;
+}
+
+message GraphQLResponse {
+    <%= query_root %> data = 1;
+    repeated google.protobuf.Struct errors = 2;
+    google.protobuf.Struct extensions = 3;
+}
+
+service GraphQLService {
+  rpc ExecuteQuery (GraphQLRequest) returns (GraphQLResponse);
+}
