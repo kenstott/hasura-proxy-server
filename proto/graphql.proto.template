@@ -9,7 +9,7 @@ package graphql;
 message GraphQLRequest {
   string operationName = 1;
   string query = 2;
-  google.protobuf.Struct variables = 3;
+  google.protobuf.Struct variablesStruct = 3;
   string variablesString = 4;
 }
 
