@@ -3,13 +3,15 @@ import * as aq from 'arquero'
 import { flatten } from 'flat'
 import { type ObjMap } from '../helpers/index.js'
 import _ from 'lodash'
+import { type ArrowFormatOptions } from 'arquero/dist/types/arrow/encode'
+import type ColumnTable from 'arquero/dist/types/table/column-table'
 
-export const flattenToTable = (dataset: Array<Record<string, unknown>>) => {
+export const flattenToTable = (dataset: Array<Record<string, unknown>>): ColumnTable => {
   dataset = dataset.map(i => flatten(i))
   const names = [...new Set(_.flatten(dataset.map(i => Object.keys(i))))]
   return aq.from(dataset, names)
 }
-export const generateResponse = (data: ObjMap<unknown>, output: FileOutput, format: FileFormat): ObjMap<unknown> => {
+export const generateResponse = (data: ObjMap<Record<string, unknown[]>>, output: FileOutput, format: FileFormat): ObjMap<unknown> => {
   const files = {}
   for (const entry of Object.entries(data)) {
     const [key, dataset] = entry
@@ -36,7 +38,8 @@ export const generateResponse = (data: ObjMap<unknown>, output: FileOutput, form
               files[key] = { arrow: outputFile[output](flattenToTable(dataset).toArrowBuffer(), format) }
               break
             default:
-              files[key] = { arrow: outputFile[FileOutput.base64](flattenToTable(dataset).toArrowBuffer(), format) }
+              // @ts-expect-error Library error
+              files[key] = { arrow: outputFile[FileOutput.base64](flattenToTable(dataset).toArrowBuffer({ format: 'file' } satisfies ArrowFormatOptions), format) }
           }
       }
     }
