@@ -9,7 +9,8 @@ import { type Response } from 'express'
 export const hasuraContext = async (context: StandaloneServerContextFunctionArgument): Promise<HasuraContext> => {
   const req: IncomingMessage & { body?: Record<string, any>, originalUrl?: string, res?: Response } = context.req
   return {
-    isSchemaQuery: req.body?.query?.indexOf('__schema') !== -1,
+    passThrough: !!req.headers['x-hasura-pass-through'],
+    isSchemaQuery: !req.headers['x-hasura-pass-through'] && req.body?.query?.indexOf('__schema') !== -1,
     userID: req.headers['x-hasura-user-id'] ?? 'anonymous',
     cwd: altProcess.cwd(),
     stopProcessing: false,

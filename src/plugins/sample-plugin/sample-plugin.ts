@@ -17,8 +17,8 @@ export const samplePlugin = plugin({
     fromEnd: false
   },
   useWithReplays: true,
-  willSendResponsePluginResolver: async ({ operation, context, singleResult, args, span }) => {
-    if (operation.kind !== Kind.OPERATION_DEFINITION || operation.operation !== 'query' || !singleResult.data) {
+  willSendResponsePluginResolver: async ({ contextValue, operation, context, singleResult, args, span }) => {
+    if (operation.kind !== Kind.OPERATION_DEFINITION || operation.operation !== 'query' || !singleResult.data || contextValue.passThrough) {
       return
     }
     const { args: ctxArgs, addToErrors } = context

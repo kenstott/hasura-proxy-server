@@ -17,11 +17,12 @@ export const fieldTrackingPlugin = plugin({
   // Define how to process your operation directive here...
   willSendResponsePluginResolver: async ({
     operation,
+    contextValue: { passThrough },
     schema,
     context,
     singleResult
   }) => {
-    if (operation.kind !== Kind.OPERATION_DEFINITION || operation.operation !== 'query' || !singleResult.data) {
+    if (operation.kind !== Kind.OPERATION_DEFINITION || operation.operation !== 'query' || !singleResult.data || passThrough) {
       return
     }
     // Destructure your operation args...like this

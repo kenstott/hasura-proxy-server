@@ -1,6 +1,7 @@
 import { type Response } from 'express'
 
 export interface HasuraContext {
+  passThrough?: boolean
   isSchemaQuery?: boolean
   userID?: string | string[]
   cwd: string

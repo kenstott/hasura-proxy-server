@@ -61,7 +61,7 @@ export const filePlugin = plugin({
     args,
     span
   }) => {
-    if (operation.kind !== Kind.OPERATION_DEFINITION || operation.operation !== 'query' || !singleResult.data) {
+    if (operation.kind !== Kind.OPERATION_DEFINITION || operation.operation !== 'query' || !singleResult.data || contextValue.passThrough) {
       return
     }
 
