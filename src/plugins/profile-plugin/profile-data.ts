@@ -5,8 +5,7 @@ import { getScalarType } from './get-scalar-type.js'
 import { analyze } from './create-stats.js'
 
 export const profileData = async (data: ObjMap<unknown>): Promise<Analysis> => {
-  const keyMap = new Map<[string, string], string>()
-  const tables = await createNarrowTable(data, keyMap)
+  const tables = await createNarrowTable(data)
   const typeMap = new Map<[string, string], ScalarType>()
   const keysMap = Object.entries(tables)
     .map(([name, table]) =>

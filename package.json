@@ -36,6 +36,7 @@
     "@opentelemetry/sdk-trace-base": "^1.22.0",
     "ajv": "^8.12.0",
     "ajv-formats": "^3.0.1",
+    "apache-arrow": "^16.1.0",
     "arquero": "^5.4.0",
     "change-case": "^5.4.4",
     "cors": "^2.8.5",
@@ -83,6 +84,9 @@
     "rimraf": "^5.0.5",
     "tsc-module-loader": "^0.0.1",
     "typescript": "^5.4.3"
+  },
+  "overrides": {
+    "apache-arrow": "^16.1.0"
   },
   "browserslist": [
     "maintained node versions"

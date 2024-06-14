@@ -2,6 +2,7 @@ import { plugin } from '../../plugin-builder/index.js'
 import { FileFormat, type FileOutput } from './output-file.js'
 import { Kind } from '../../common/index.js'
 import { generateResponse } from './generate-response.js'
+import { type ObjMap } from 'graphql/jsutils/ObjMap'
 
 /**
  * @description Adds @sample operation directive to queries, which will
@@ -84,7 +85,7 @@ export const filePlugin = plugin({
         response?.json(singleResult)
         return
       }
-      const files = generateResponse(singleResult.data, output as FileOutput, format as FileFormat)
+      const files = generateResponse((singleResult.data as ObjMap<Record<string, unknown[]>>), output as FileOutput, format as FileFormat)
       addToExtensions(singleResult, { files })
     } catch (error) {
       // Trap processing errors like this...

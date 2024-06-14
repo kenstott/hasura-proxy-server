@@ -1,9 +1,9 @@
 import { FileFormat, FileOutput, outputFile } from './output-file.js'
 import * as aq from 'arquero'
+import * as arrow from 'apache-arrow'
 import { flatten } from 'flat'
 import { type ObjMap } from '../helpers/index.js'
 import _ from 'lodash'
-import { type ArrowFormatOptions } from 'arquero/dist/types/arrow/encode'
 import type ColumnTable from 'arquero/dist/types/table/column-table'
 
 export const flattenToTable = (dataset: Array<Record<string, unknown>>): ColumnTable => {
@@ -34,12 +34,18 @@ export const generateResponse = (data: ObjMap<Record<string, unknown[]>>, output
           break
         case FileFormat.arrow:
           switch (output) {
-            case FileOutput.dataUri:
-              files[key] = { arrow: outputFile[output](flattenToTable(dataset).toArrowBuffer(), format) }
+            case FileOutput.dataUri: {
+              const table = arrow.tableFromIPC(flattenToTable(dataset).toArrowBuffer())
+              const serialized = arrow.tableToIPC(table)
+              files[key] = { arrow: outputFile[output](serialized, format) }
+            }
               break
-            default:
-              // @ts-expect-error Library error
-              files[key] = { arrow: outputFile[FileOutput.base64](flattenToTable(dataset).toArrowBuffer({ format: 'file' } satisfies ArrowFormatOptions), format) }
+            default: {
+              const table = arrow.tableFromIPC(flattenToTable(dataset).toArrowBuffer())
+              const serialized = arrow.tableToIPC(table)
+              files[key] = { arrow: outputFile[FileOutput.base64](serialized, format) }
+            }
+              break
           }
       }
     }
