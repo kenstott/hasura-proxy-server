@@ -1,5 +1,6 @@
 import { startServer } from './start-server.js'
 import { startServer as startGRPCServer } from '../grpc/start-grpc-server'
+import { startServer as startJSONRPCServer } from '../json-rpc/start-json-rpc-server'
 import { PLUGINS } from './config.js'
 import { altPath, altProcess, type HasuraPlugin } from '../common/index.js'
 import { createRequire } from 'module'
@@ -17,4 +18,9 @@ for (const modulePath of (PLUGINS ?? '').split(',').filter(Boolean)) {
   plugins.push(p.default as HasuraPlugin)
 }
 const app = await startServer(plugins)
-await startGRPCServer(app)
+if (process.env.GRPC_PORT) {
+  await startGRPCServer(app)
+}
+if (process.env.JSON_RPC_HTTP_PORT || process.env.JSON_RPC_SOCKETS_PORT) {
+  await startJSONRPCServer(app)
+}

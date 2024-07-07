@@ -144,7 +144,7 @@ have no module dependencies between the proxy server and the plugin.
 | [Data Validator](./src/plugins/validate-plugin/README.md) | ./dist/plugins/validate-plugin.js                                 | @validate             | Validates a result set against a JSON Schema                                                                                                                                                                                                                |
 | [Sampler](./src/plugins/sample-plugin/README.md)        | ./dist/plugins/sample-plugin.js                                   | @sample               | Reduces the queried dataset by taking the first, last or random # of elements. Useful for a few scenarios, but an example might be to use the Data Validator plugin combined with Sampler, so that you only retrieve the records that failed the validator. |
 | [Data Anomaly Detection](./src/plugins/data-anomalies-plugin/README.md) | ./dist/plugins/data-anomalies-plugin/data-anomalies-plugin.js     | @anomalies            | Identifies records in a queried result that are outliers.                                                                                                                                                                                                   |
-| [Field Tracking](./src/plugins/field-tracking-plugin/README.md) | ./dist/plugins/field-tracking-plugin/field-tracking-plugin.js     | automatic             | Adds field level traces for all query operations                                                                                                                                                                                                            |
+| [FieldIntermediate Tracking](./src/plugins/field-tracking-plugin/README.md) | ./dist/plugins/field-tracking-plugin/field-tracking-plugin.js     | automatic             | Adds field level traces for all query operations                                                                                                                                                                                                            |
 | Files                                                   | ./dist/plugins/file-plugin/file-plugin.js                         | @file or /gql/:format | Returns various file formats and output formats for a query operation                                                                                                                                                                                       |
 | Naming Standards                                        | ./dist/plugins/naming-standards-plugin/naming-standards-plugin.js | automatic             | Enforces this pattern on query operation names `<verb><Object Type><optional list of adjectives and nouns>`. Provides additional, useful explanation on why a query was made. Can be used for support, audit or LLM prompt engineering                      |
 | Data Profiler                                           | ./dist/plugins/profile-plugin/profile-plugin.js                   | @profile              | Provides various statistical measures for each scalar field in a query.                                                                                                                                                                                     |
@@ -174,6 +174,37 @@ circumstances you may see a mirror source file - *.deno.ts. That has the deno ve
 
 You may also see some runtime switches where there maybe a code branch that is activated when
 the global variable 'Deno' is detected.
+
+### Alternate Transports
+
+#### gRPC
+
+You can use gRPC to communicate with hasura-proxy. Just set the env variable
+
+```GRPC_PORT=50051```
+
+to a valid port value. You can execute a GraphQL query calling the `ExecuteQuery` RPC method.
+
+Just like calling GraphQL on an HTTP POST, you supply an operationName, query, and variables.
+
+It returns the value in same format as standard GraphQL result.
+
+#### JSON-RPC
+
+You can use JSON-RPC to communicate with hasura-proxy. Just set one or both of these env variable
+
+```
+JSON_RPC_HTTP_PORT=3330
+JSON_RPC_SOCKETS_PORT=3331
+```
+
+to a valid port value. You can execute a GraphQL query calling the `query` RPC method.
+
+Just like calling GraphQL on an HTTP POST, you supply an operationName, query, and variables.
+
+JSON-RPC validates on each call - you validate by adding a 'secret' variable equal to the `x-hasura-admin-secret`.
+
+It returns the value in same format as standard GraphQL result.
 
 
 

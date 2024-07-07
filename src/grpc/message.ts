@@ -1,4 +1,5 @@
 import { Field, type IField } from './field'
+import { JSONSchemaType } from 'ajv'
 
 export interface IMessage {
   name: string
@@ -24,7 +25,17 @@ export class Message implements IMessage {
 
   print (): string {
     return `message ${this.name} {` + '\n' +
-            this.fields.map((i, index) => '   ' + i.print(index + 1)).join('\n') +
-            '\n}\n'
+        this.fields.map((i, index) => '   ' + i.print(index + 1)).join('\n') +
+        '\n}\n'
+  }
+
+  jsonschema (): Record<string, any> {
+    return {
+      type: 'object',
+      properties: this.fields.reduce((acc, i) => {
+        return { ...acc, [i.name || '']: i.jsonSchema() }
+      }, {}),
+      required: this.fields.filter((i) => i.required).map((i) => i.name)
+    }
   }
 }

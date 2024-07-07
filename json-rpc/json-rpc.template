@@ -1,0 +1,51 @@
+{
+  "openrpc": "1.0.0-rc1",
+  "info": {
+    "title": "JSON RPC GraphQL Server",
+    "description": "Provides a JSON-RPC interface to a GraphQL Server",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "name": "json rpc graphql server",
+      "url": "http://${server}:${port}/${basePath}/",
+      "variables": {
+        "server": {
+          "default": "<%= server %>",
+          "description": "this is applied to the url as the subdomain"
+        },
+        "port": {
+          "default": "<%= port %>"
+        },
+        "basePath": {
+          "default": "<%= basePath %>"
+        }
+      }
+    }
+  ],
+  "methods": [
+    {
+      "name": "query",
+      "params": [
+        { "name": "operationName", "required": true, "schema": { "type": "string" } },
+        { "name": "query", "required": true, "schema": { "type": "string" } },
+        { "name": "variables", "schema" : { "type": "object" } },
+        { "name": "secret", "schema" : { "type": "string" } }
+      ],
+      "result": {
+         "name": "result",
+         "schema": {
+            "type": "object",
+            "properties": {
+               "data": { "$ref": "#/components/schemas/query_root" },
+               "errors": { "type": "object" },
+               "extensions": { "type": "object" }
+            }
+         }
+      }
+    }
+  ],
+  "components": {
+     "schemas": <%= components %>
+  }
+}

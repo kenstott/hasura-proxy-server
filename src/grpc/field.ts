@@ -1,3 +1,18 @@
+const jsonSchemaTypeMap = {
+  int32: 'integer',
+  string: 'string',
+  float: 'number',
+  bool: 'boolean'
+}
+
+const mapJsonSchemaType = (t: string): Record<string, string> => {
+  if (jsonSchemaTypeMap[t]) {
+    return { type: jsonSchemaTypeMap[t] }
+  }
+  return {
+    $ref: `#/components/schemas/${t}`
+  }
+}
 export interface IField {
   name?: string
   type?: string
@@ -52,5 +67,16 @@ export class Field implements IField {
 
   print (fieldNumber: number): string {
     return `${this.repeated ? 'repeated ' : ''}${this.required ? 'required ' : ''}${this.type} ${this.name} = ${fieldNumber};`
+  }
+
+  jsonSchema (): Record<string, any> {
+    if (this.repeated) {
+      return {
+        type: 'array',
+        items: mapJsonSchemaType(this.type || '')
+      }
+    } else {
+      return mapJsonSchemaType(this.type || '')
+    }
   }
 }
