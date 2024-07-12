@@ -1,0 +1,2228 @@
+{
+  "definitions": {
+    "ASTNode": {
+      "anyOf": [
+        {
+          "$ref": "#/components/schemas/NameNode"
+        },
+        {
+          "$ref": "#/components/schemas/DocumentNode"
+        },
+        {
+          "$ref": "#/components/schemas/OperationDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/VariableDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/VariableNode"
+        },
+        {
+          "$ref": "#/components/schemas/SelectionSetNode"
+        },
+        {
+          "$ref": "#/components/schemas/FieldNode"
+        },
+        {
+          "$ref": "#/components/schemas/ArgumentNode"
+        },
+        {
+          "$ref": "#/components/schemas/FragmentSpreadNode"
+        },
+        {
+          "$ref": "#/components/schemas/InlineFragmentNode"
+        },
+        {
+          "$ref": "#/components/schemas/FragmentDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/IntValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/FloatValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/StringValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/BooleanValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/NullValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/EnumValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/ListValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/ObjectValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/ObjectFieldNode"
+        },
+        {
+          "$ref": "#/components/schemas/DirectiveNode"
+        },
+        {
+          "$ref": "#/components/schemas/NamedTypeNode"
+        },
+        {
+          "$ref": "#/components/schemas/ListTypeNode"
+        },
+        {
+          "$ref": "#/components/schemas/NonNullTypeNode"
+        },
+        {
+          "$ref": "#/components/schemas/SchemaDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/OperationTypeDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/ScalarTypeDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/ObjectTypeDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/FieldDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/InputValueDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/InterfaceTypeDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/UnionTypeDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/EnumTypeDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/EnumValueDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/InputObjectTypeDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/DirectiveDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/SchemaExtensionNode"
+        },
+        {
+          "$ref": "#/components/schemas/ScalarTypeExtensionNode"
+        },
+        {
+          "$ref": "#/components/schemas/ObjectTypeExtensionNode"
+        },
+        {
+          "$ref": "#/components/schemas/InterfaceTypeExtensionNode"
+        },
+        {
+          "$ref": "#/components/schemas/UnionTypeExtensionNode"
+        },
+        {
+          "$ref": "#/components/schemas/EnumTypeExtensionNode"
+        },
+        {
+          "$ref": "#/components/schemas/InputObjectTypeExtensionNode"
+        }
+      ],
+      "description": "The list of all possible AST node types."
+    },
+    "ArgumentNode": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "Argument",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        },
+        "value": {
+          "$ref": "#/components/schemas/ValueNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name",
+        "value"
+      ],
+      "type": "object"
+    },
+    "BooleanValueNode": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "BooleanValue",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ConstArgumentNode": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "Argument",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        },
+        "value": {
+          "$ref": "#/components/schemas/ConstValueNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ConstDirectiveNode": {
+      "additionalProperties": false,
+      "properties": {
+        "arguments": {
+          "items": {
+            "$ref": "#/components/schemas/ConstArgumentNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "Directive",
+          "description": "Directives",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "ConstListValueNode": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "ListValue",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "values": {
+          "items": {
+            "$ref": "#/components/schemas/ConstValueNode"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "values"
+      ],
+      "type": "object"
+    },
+    "ConstObjectFieldNode": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "ObjectField",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        },
+        "value": {
+          "$ref": "#/components/schemas/ConstValueNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ConstObjectValueNode": {
+      "additionalProperties": false,
+      "properties": {
+        "fields": {
+          "items": {
+            "$ref": "#/components/schemas/ConstObjectFieldNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "ObjectValue",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        }
+      },
+      "required": [
+        "kind",
+        "fields"
+      ],
+      "type": "object"
+    },
+    "ConstValueNode": {
+      "anyOf": [
+        {
+          "$ref": "#/components/schemas/IntValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/FloatValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/StringValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/BooleanValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/NullValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/EnumValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/ConstListValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/ConstObjectValueNode"
+        }
+      ]
+    },
+    "DefinitionNode": {
+      "anyOf": [
+        {
+          "$ref": "#/components/schemas/ExecutableDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/TypeSystemDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/TypeSystemExtensionNode"
+        }
+      ]
+    },
+    "DirectiveDefinitionNode": {
+      "additionalProperties": false,
+      "description": "Directive Definitions",
+      "properties": {
+        "arguments": {
+          "items": {
+            "$ref": "#/components/schemas/InputValueDefinitionNode"
+          },
+          "type": "array"
+        },
+        "description": {
+          "$ref": "#/components/schemas/StringValueNode"
+        },
+        "kind": {
+          "const": "DirectiveDefinition",
+          "description": "Directive Definitions",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "locations": {
+          "items": {
+            "$ref": "#/components/schemas/NameNode"
+          },
+          "type": "array"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        },
+        "repeatable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "name",
+        "repeatable",
+        "locations"
+      ],
+      "type": "object"
+    },
+    "DirectiveNode": {
+      "additionalProperties": false,
+      "description": "Directives",
+      "properties": {
+        "arguments": {
+          "items": {
+            "$ref": "#/components/schemas/ArgumentNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "Directive",
+          "description": "Directives",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "DocumentNode": {
+      "additionalProperties": false,
+      "description": "Document",
+      "properties": {
+        "definitions": {
+          "items": {
+            "$ref": "#/components/schemas/DefinitionNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "Document",
+          "description": "Document",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        }
+      },
+      "required": [
+        "kind",
+        "definitions"
+      ],
+      "type": "object"
+    },
+    "EnumTypeDefinitionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "$ref": "#/components/schemas/StringValueNode"
+        },
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/ConstDirectiveNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "EnumTypeDefinition",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        },
+        "values": {
+          "items": {
+            "$ref": "#/components/schemas/EnumValueDefinitionNode"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "EnumTypeExtensionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/ConstDirectiveNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "EnumTypeExtension",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        },
+        "values": {
+          "items": {
+            "$ref": "#/components/schemas/EnumValueDefinitionNode"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "EnumValueDefinitionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "$ref": "#/components/schemas/StringValueNode"
+        },
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/ConstDirectiveNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "EnumValueDefinition",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "EnumValueNode": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "EnumValue",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ExecutableDefinitionNode": {
+      "anyOf": [
+        {
+          "$ref": "#/components/schemas/OperationDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/FragmentDefinitionNode"
+        }
+      ]
+    },
+    "FieldDefinitionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "arguments": {
+          "items": {
+            "$ref": "#/components/schemas/InputValueDefinitionNode"
+          },
+          "type": "array"
+        },
+        "description": {
+          "$ref": "#/components/schemas/StringValueNode"
+        },
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/ConstDirectiveNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "FieldDefinition",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        },
+        "type": {
+          "$ref": "#/components/schemas/TypeNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name",
+        "type"
+      ],
+      "type": "object"
+    },
+    "FieldNode": {
+      "additionalProperties": false,
+      "properties": {
+        "alias": {
+          "$ref": "#/components/schemas/NameNode"
+        },
+        "arguments": {
+          "items": {
+            "$ref": "#/components/schemas/ArgumentNode"
+          },
+          "type": "array"
+        },
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/DirectiveNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "Field",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        },
+        "selectionSet": {
+          "$ref": "#/components/schemas/SelectionSetNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "FloatValueNode": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "FloatValue",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "type": "object"
+    },
+    "FragmentDefinitionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/DirectiveNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "FragmentDefinition",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        },
+        "selectionSet": {
+          "$ref": "#/components/schemas/SelectionSetNode"
+        },
+        "typeCondition": {
+          "$ref": "#/components/schemas/NamedTypeNode"
+        },
+        "variableDefinitions": {
+          "deprecated": "variableDefinitions will be removed in v17.0.0",
+          "items": {
+            "$ref": "#/components/schemas/VariableDefinitionNode"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "name",
+        "typeCondition",
+        "selectionSet"
+      ],
+      "type": "object"
+    },
+    "FragmentSpreadNode": {
+      "additionalProperties": false,
+      "description": "Fragments",
+      "properties": {
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/DirectiveNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "FragmentSpread",
+          "description": "Fragments",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "GraphQLError": {
+      "additionalProperties": false,
+      "description": "A GraphQLError describes an Error found during the parse, validate, or execute phases of performing a GraphQL operation. In addition to a message and stack trace, it also includes information about the locations in a GraphQL document and/or execution result that correspond to the Error.",
+      "properties": {
+        "extensions": {
+          "$ref": "#/components/schemas/GraphQLErrorExtensions",
+          "description": "Extension fields to add to the formatted error."
+        },
+        "locations": {
+          "description": "An array of `{ line, column }` locations within the source GraphQL document which correspond to this error.\n\nErrors during validation often contain multiple locations, for example to point out two things with the same name. Errors during execution include a single location, the field which produced the error.\n\nEnumerable, and appears in the result of JSON.stringify().",
+          "items": {
+            "$ref": "#/components/schemas/SourceLocation"
+          },
+          "type": "array"
+        },
+        "message": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "nodes": {
+          "description": "An array of GraphQL AST Nodes corresponding to this error.",
+          "items": {
+            "$ref": "#/components/schemas/ASTNode"
+          },
+          "type": "array"
+        },
+        "originalError": {
+          "additionalProperties": false,
+          "description": "The original error thrown from a field resolver during execution.",
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "stack": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "message"
+          ],
+          "type": "object"
+        },
+        "path": {
+          "description": "An array describing the JSON-path into the execution response which corresponds to this error. Only included for errors during execution.\n\nEnumerable, and appears in the result of JSON.stringify().",
+          "items": {
+            "type": [
+              "string",
+              "number"
+            ]
+          },
+          "type": "array"
+        },
+        "positions": {
+          "description": "An array of character offsets within the source GraphQL document which correspond to this error.",
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "source": {
+          "$ref": "#/components/schemas/Source",
+          "description": "The source GraphQL document for the first location of this error.\n\nNote that if this Error represents more than one node, the source may not represent nodes after the first node."
+        },
+        "stack": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "extensions",
+        "message",
+        "name"
+      ],
+      "type": "object"
+    },
+    "GraphQLErrorExtensions": {
+      "additionalProperties": {},
+      "description": "Custom extensions",
+      "type": "object"
+    },
+    "GraphQLErrorOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "extensions": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/components/schemas/GraphQLErrorExtensions"
+            }
+          ]
+        },
+        "nodes": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/components/schemas/ASTNode"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "#/components/schemas/ASTNode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "originalError": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "extensions": {},
+                "message": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "stack": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message",
+                "name"
+              ],
+              "type": "object"
+            }
+          ]
+        },
+        "path": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "items": {
+                "type": [
+                  "string",
+                  "number"
+                ]
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "positions": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "source": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/components/schemas/Source"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "GraphQLFormattedError": {
+      "additionalProperties": false,
+      "description": "See: https://spec.graphql.org/draft/#sec-Errors",
+      "properties": {
+        "extensions": {
+          "additionalProperties": {},
+          "description": "Reserved for implementors to extend the protocol however they see fit, and hence there are no additional restrictions on its contents.",
+          "type": "object"
+        },
+        "locations": {
+          "description": "If an error can be associated to a particular point in the requested GraphQL document, it should contain a list of locations.",
+          "items": {
+            "$ref": "#/components/schemas/SourceLocation"
+          },
+          "type": "array"
+        },
+        "message": {
+          "description": "A short, human-readable summary of the problem that **SHOULD NOT** change from occurrence to occurrence of the problem, except for purposes of localization.",
+          "type": "string"
+        },
+        "path": {
+          "description": "If an error can be associated to a particular field in the GraphQL result, it _must_ contain an entry with the key `path` that details the path of the response field which experienced the error. This allows clients to identify whether a null result is intentional or caused by a runtime error.",
+          "items": {
+            "type": [
+              "string",
+              "number"
+            ]
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "type": "object"
+    },
+    "InlineFragmentNode": {
+      "additionalProperties": false,
+      "properties": {
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/DirectiveNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "InlineFragment",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "selectionSet": {
+          "$ref": "#/components/schemas/SelectionSetNode"
+        },
+        "typeCondition": {
+          "$ref": "#/components/schemas/NamedTypeNode"
+        }
+      },
+      "required": [
+        "kind",
+        "selectionSet"
+      ],
+      "type": "object"
+    },
+    "InputObjectTypeDefinitionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "$ref": "#/components/schemas/StringValueNode"
+        },
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/ConstDirectiveNode"
+          },
+          "type": "array"
+        },
+        "fields": {
+          "items": {
+            "$ref": "#/components/schemas/InputValueDefinitionNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "InputObjectTypeDefinition",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "InputObjectTypeExtensionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/ConstDirectiveNode"
+          },
+          "type": "array"
+        },
+        "fields": {
+          "items": {
+            "$ref": "#/components/schemas/InputValueDefinitionNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "InputObjectTypeExtension",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "InputValueDefinitionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "defaultValue": {
+          "$ref": "#/components/schemas/ConstValueNode"
+        },
+        "description": {
+          "$ref": "#/components/schemas/StringValueNode"
+        },
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/ConstDirectiveNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "InputValueDefinition",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        },
+        "type": {
+          "$ref": "#/components/schemas/TypeNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name",
+        "type"
+      ],
+      "type": "object"
+    },
+    "IntValueNode": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "IntValue",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "type": "object"
+    },
+    "InterfaceTypeDefinitionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "$ref": "#/components/schemas/StringValueNode"
+        },
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/ConstDirectiveNode"
+          },
+          "type": "array"
+        },
+        "fields": {
+          "items": {
+            "$ref": "#/components/schemas/FieldDefinitionNode"
+          },
+          "type": "array"
+        },
+        "interfaces": {
+          "items": {
+            "$ref": "#/components/schemas/NamedTypeNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "InterfaceTypeDefinition",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "InterfaceTypeExtensionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/ConstDirectiveNode"
+          },
+          "type": "array"
+        },
+        "fields": {
+          "items": {
+            "$ref": "#/components/schemas/FieldDefinitionNode"
+          },
+          "type": "array"
+        },
+        "interfaces": {
+          "items": {
+            "$ref": "#/components/schemas/NamedTypeNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "InterfaceTypeExtension",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "ListTypeNode": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "ListType",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "type": {
+          "$ref": "#/components/schemas/TypeNode"
+        }
+      },
+      "required": [
+        "kind",
+        "type"
+      ],
+      "type": "object"
+    },
+    "ListValueNode": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "ListValue",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "values": {
+          "items": {
+            "$ref": "#/components/schemas/ValueNode"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "values"
+      ],
+      "type": "object"
+    },
+    "Location": {
+      "additionalProperties": false,
+      "description": "Contains a range of UTF-8 character offsets and token references that identify the region of the source from which the AST derived.",
+      "properties": {
+        "end": {
+          "description": "The character offset at which this Node ends.",
+          "type": "number"
+        },
+        "endToken": {
+          "$ref": "#/components/schemas/Token",
+          "description": "The Token at which this Node ends."
+        },
+        "source": {
+          "$ref": "#/components/schemas/Source",
+          "description": "The Source document the AST represents."
+        },
+        "start": {
+          "description": "The character offset at which this Node begins.",
+          "type": "number"
+        },
+        "startToken": {
+          "$ref": "#/components/schemas/Token",
+          "description": "The Token at which this Node begins."
+        }
+      },
+      "required": [
+        "start",
+        "end",
+        "startToken",
+        "endToken",
+        "source"
+      ],
+      "type": "object"
+    },
+    "Maybe<(interface-532237016-44079-44159-532237016-0-215038&structure-286009770-861-906-286009770-849-906-286009770-842-910-286009770-824-911-286009770-616-959-286009770-0-5196)>": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "not": {}
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "extensions": {},
+            "message": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "stack": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "message",
+            "name"
+          ],
+          "type": "object"
+        }
+      ],
+      "description": "Conveniently represents flow's \"Maybe\" type https://flow.org/en/docs/types/maybe/"
+    },
+    "Maybe<(string|number)[]>": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "not": {}
+        },
+        {
+          "items": {
+            "type": [
+              "string",
+              "number"
+            ]
+          },
+          "type": "array"
+        }
+      ],
+      "description": "Conveniently represents flow's \"Maybe\" type https://flow.org/en/docs/types/maybe/"
+    },
+    "Maybe<GraphQLErrorExtensions>": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "not": {}
+        },
+        {
+          "$ref": "#/components/schemas/GraphQLErrorExtensions"
+        }
+      ],
+      "description": "Conveniently represents flow's \"Maybe\" type https://flow.org/en/docs/types/maybe/"
+    },
+    "Maybe<Source>": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "not": {}
+        },
+        {
+          "$ref": "#/components/schemas/Source"
+        }
+      ],
+      "description": "Conveniently represents flow's \"Maybe\" type https://flow.org/en/docs/types/maybe/"
+    },
+    "Maybe<number[]>": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "not": {}
+        },
+        {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        }
+      ],
+      "description": "Conveniently represents flow's \"Maybe\" type https://flow.org/en/docs/types/maybe/"
+    },
+    "NameNode": {
+      "additionalProperties": false,
+      "description": "Name",
+      "properties": {
+        "kind": {
+          "const": "Name",
+          "description": "Name",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "type": "object"
+    },
+    "NamedTypeNode": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "NamedType",
+          "description": "Types",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "NonNullTypeNode": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "NonNullType",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "type": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/NamedTypeNode"
+            },
+            {
+              "$ref": "#/components/schemas/ListTypeNode"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "type"
+      ],
+      "type": "object"
+    },
+    "NullValueNode": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "NullValue",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    },
+    "ObjectFieldNode": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "ObjectField",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        },
+        "value": {
+          "$ref": "#/components/schemas/ValueNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name",
+        "value"
+      ],
+      "type": "object"
+    },
+    "ObjectTypeDefinitionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "$ref": "#/components/schemas/StringValueNode"
+        },
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/ConstDirectiveNode"
+          },
+          "type": "array"
+        },
+        "fields": {
+          "items": {
+            "$ref": "#/components/schemas/FieldDefinitionNode"
+          },
+          "type": "array"
+        },
+        "interfaces": {
+          "items": {
+            "$ref": "#/components/schemas/NamedTypeNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "ObjectTypeDefinition",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "ObjectTypeExtensionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/ConstDirectiveNode"
+          },
+          "type": "array"
+        },
+        "fields": {
+          "items": {
+            "$ref": "#/components/schemas/FieldDefinitionNode"
+          },
+          "type": "array"
+        },
+        "interfaces": {
+          "items": {
+            "$ref": "#/components/schemas/NamedTypeNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "ObjectTypeExtension",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "ObjectValueNode": {
+      "additionalProperties": false,
+      "properties": {
+        "fields": {
+          "items": {
+            "$ref": "#/components/schemas/ObjectFieldNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "ObjectValue",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        }
+      },
+      "required": [
+        "kind",
+        "fields"
+      ],
+      "type": "object"
+    },
+    "OperationDefinitionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/DirectiveNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "OperationDefinition",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        },
+        "operation": {
+          "enum": [
+            "query",
+            "mutation",
+            "subscription"
+          ],
+          "type": "string"
+        },
+        "selectionSet": {
+          "$ref": "#/components/schemas/SelectionSetNode"
+        },
+        "variableDefinitions": {
+          "items": {
+            "$ref": "#/components/schemas/VariableDefinitionNode"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "operation",
+        "selectionSet"
+      ],
+      "type": "object"
+    },
+    "OperationTypeDefinitionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "OperationTypeDefinition",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "operation": {
+          "enum": [
+            "query",
+            "mutation",
+            "subscription"
+          ],
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/components/schemas/NamedTypeNode"
+        }
+      },
+      "required": [
+        "kind",
+        "operation",
+        "type"
+      ],
+      "type": "object"
+    },
+    "ScalarTypeDefinitionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "$ref": "#/components/schemas/StringValueNode"
+        },
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/ConstDirectiveNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "ScalarTypeDefinition",
+          "description": "Type Definitions",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "ScalarTypeExtensionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/ConstDirectiveNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "ScalarTypeExtension",
+          "description": "Type Extensions",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "SchemaDefinitionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "$ref": "#/components/schemas/StringValueNode"
+        },
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/ConstDirectiveNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "SchemaDefinition",
+          "description": "Type System Definitions",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "operationTypes": {
+          "items": {
+            "$ref": "#/components/schemas/OperationTypeDefinitionNode"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "operationTypes"
+      ],
+      "type": "object"
+    },
+    "SchemaExtensionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/ConstDirectiveNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "SchemaExtension",
+          "description": "Type System Extensions",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "operationTypes": {
+          "items": {
+            "$ref": "#/components/schemas/OperationTypeDefinitionNode"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    },
+    "SelectionNode": {
+      "anyOf": [
+        {
+          "$ref": "#/components/schemas/FieldNode"
+        },
+        {
+          "$ref": "#/components/schemas/FragmentSpreadNode"
+        },
+        {
+          "$ref": "#/components/schemas/InlineFragmentNode"
+        }
+      ]
+    },
+    "SelectionSetNode": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "SelectionSet",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "selections": {
+          "items": {
+            "$ref": "#/components/schemas/SelectionNode"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "selections"
+      ],
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "description": "A representation of source input to GraphQL. The `name` and `locationOffset` parameters are optional, but they are useful for clients who store GraphQL documents in source files. For example, if the GraphQL input starts at line 40 in a file named `Foo.graphql`, it might be useful for `name` to be `\"Foo.graphql\"` and location to be `{ line: 40, column: 1 }`. The `line` and `column` properties in `locationOffset` are 1-indexed.",
+      "properties": {
+        "body": {
+          "type": "string"
+        },
+        "locationOffset": {
+          "additionalProperties": false,
+          "properties": {
+            "column": {
+              "type": "number"
+            },
+            "line": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "line",
+            "column"
+          ],
+          "type": "object"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "body",
+        "name",
+        "locationOffset"
+      ],
+      "type": "object"
+    },
+    "SourceLocation": {
+      "additionalProperties": false,
+      "description": "Represents a location in a Source.",
+      "properties": {
+        "column": {
+          "type": "number"
+        },
+        "line": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "line",
+        "column"
+      ],
+      "type": "object"
+    },
+    "StringValueNode": {
+      "additionalProperties": false,
+      "properties": {
+        "block": {
+          "type": "boolean"
+        },
+        "kind": {
+          "const": "StringValue",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "type": "object"
+    },
+    "Token": {
+      "additionalProperties": false,
+      "description": "Represents a range of characters represented by a lexical token within a Source.",
+      "properties": {
+        "column": {
+          "description": "The 1-indexed column number at which this Token begins.",
+          "type": "number"
+        },
+        "end": {
+          "description": "The character offset at which this Node ends.",
+          "type": "number"
+        },
+        "kind": {
+          "description": "The kind of Token.",
+          "enum": [
+            "<SOF>",
+            "<EOF>",
+            "!",
+            "$",
+            "&",
+            "(",
+            ")",
+            "...",
+            ":",
+            "=",
+            "@",
+            "[",
+            "]",
+            "{",
+            "|",
+            "}",
+            "Name",
+            "Int",
+            "Float",
+            "String",
+            "BlockString",
+            "Comment"
+          ],
+          "type": "string"
+        },
+        "line": {
+          "description": "The 1-indexed line number on which this Token appears.",
+          "type": "number"
+        },
+        "next": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/Token"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "prev": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/Token"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Tokens exist as nodes in a double-linked-list amongst all tokens including ignored tokens. <SOF> is always the first node and <EOF> the last."
+        },
+        "start": {
+          "description": "The character offset at which this Node begins.",
+          "type": "number"
+        },
+        "value": {
+          "description": "For non-punctuation tokens, represents the interpreted value of the token.\n\nNote: is undefined for punctuation tokens, but typed as string for convenience in the parser.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "start",
+        "end",
+        "line",
+        "column",
+        "value",
+        "prev",
+        "next"
+      ],
+      "type": "object"
+    },
+    "TypeDefinitionNode": {
+      "anyOf": [
+        {
+          "$ref": "#/components/schemas/ScalarTypeDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/ObjectTypeDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/InterfaceTypeDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/UnionTypeDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/EnumTypeDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/InputObjectTypeDefinitionNode"
+        }
+      ],
+      "description": "Type Definition"
+    },
+    "TypeExtensionNode": {
+      "anyOf": [
+        {
+          "$ref": "#/components/schemas/ScalarTypeExtensionNode"
+        },
+        {
+          "$ref": "#/components/schemas/ObjectTypeExtensionNode"
+        },
+        {
+          "$ref": "#/components/schemas/InterfaceTypeExtensionNode"
+        },
+        {
+          "$ref": "#/components/schemas/UnionTypeExtensionNode"
+        },
+        {
+          "$ref": "#/components/schemas/EnumTypeExtensionNode"
+        },
+        {
+          "$ref": "#/components/schemas/InputObjectTypeExtensionNode"
+        }
+      ],
+      "description": "Type Extensions"
+    },
+    "TypeNode": {
+      "anyOf": [
+        {
+          "$ref": "#/components/schemas/NamedTypeNode"
+        },
+        {
+          "$ref": "#/components/schemas/ListTypeNode"
+        },
+        {
+          "$ref": "#/components/schemas/NonNullTypeNode"
+        }
+      ],
+      "description": "Type Reference"
+    },
+    "TypeSystemDefinitionNode": {
+      "anyOf": [
+        {
+          "$ref": "#/components/schemas/SchemaDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/TypeDefinitionNode"
+        },
+        {
+          "$ref": "#/components/schemas/DirectiveDefinitionNode"
+        }
+      ],
+      "description": "Type System Definition"
+    },
+    "TypeSystemExtensionNode": {
+      "anyOf": [
+        {
+          "$ref": "#/components/schemas/SchemaExtensionNode"
+        },
+        {
+          "$ref": "#/components/schemas/TypeExtensionNode"
+        }
+      ],
+      "description": "Type System Extensions"
+    },
+    "UnionTypeDefinitionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "$ref": "#/components/schemas/StringValueNode"
+        },
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/ConstDirectiveNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "UnionTypeDefinition",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        },
+        "types": {
+          "items": {
+            "$ref": "#/components/schemas/NamedTypeNode"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "UnionTypeExtensionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/ConstDirectiveNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "UnionTypeExtension",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        },
+        "types": {
+          "items": {
+            "$ref": "#/components/schemas/NamedTypeNode"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "ValueNode": {
+      "anyOf": [
+        {
+          "$ref": "#/components/schemas/VariableNode"
+        },
+        {
+          "$ref": "#/components/schemas/IntValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/FloatValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/StringValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/BooleanValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/NullValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/EnumValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/ListValueNode"
+        },
+        {
+          "$ref": "#/components/schemas/ObjectValueNode"
+        }
+      ],
+      "description": "Values"
+    },
+    "VariableDefinitionNode": {
+      "additionalProperties": false,
+      "properties": {
+        "defaultValue": {
+          "$ref": "#/components/schemas/ConstValueNode"
+        },
+        "directives": {
+          "items": {
+            "$ref": "#/components/schemas/ConstDirectiveNode"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "const": "VariableDefinition",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "type": {
+          "$ref": "#/components/schemas/TypeNode"
+        },
+        "variable": {
+          "$ref": "#/components/schemas/VariableNode"
+        }
+      },
+      "required": [
+        "kind",
+        "variable",
+        "type"
+      ],
+      "type": "object"
+    },
+    "VariableNode": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "Variable",
+          "description": "Values",
+          "type": "string"
+        },
+        "loc": {
+          "$ref": "#/components/schemas/Location"
+        },
+        "name": {
+          "$ref": "#/components/schemas/NameNode"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "formatError": {
+      "$comment": "(error: GraphQLError) => GraphQLFormattedError",
+      "properties": {
+        "namedArgs": {
+          "additionalProperties": false,
+          "properties": {
+            "error": {
+              "$ref": "#/components/schemas/GraphQLError"
+            }
+          },
+          "required": [
+            "error"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "printError": {
+      "$comment": "(error: GraphQLError) => string",
+      "properties": {
+        "namedArgs": {
+          "additionalProperties": false,
+          "properties": {
+            "error": {
+              "$ref": "#/components/schemas/GraphQLError"
+            }
+          },
+          "required": [
+            "error"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "object"
+    }
+  }
+}

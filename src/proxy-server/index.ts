@@ -4,6 +4,7 @@ import { startServer as startJSONRPCServer } from '../json-rpc/start-json-rpc-se
 import { PLUGINS } from './config.js'
 import { altPath, altProcess, type HasuraPlugin } from '../common/index.js'
 import { createRequire } from 'module'
+import { restified } from '../restified/restified'
 // @ts-expect-error Deno is only available when running under the Deno engine
 if (typeof Deno !== 'undefined') {
   // do nothing
@@ -23,4 +24,7 @@ if (process.env.GRPC_PORT) {
 }
 if (process.env.JSON_RPC_HTTP_PORT || process.env.JSON_RPC_SOCKETS_PORT) {
   await startJSONRPCServer(app)
+}
+if (process.env.RESTIFIED_OPS) {
+  await restified(app)
 }

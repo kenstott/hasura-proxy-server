@@ -10,18 +10,22 @@ import { type FormattedExecutionResult } from 'graphql/execution'
 import { type TransportNames, type TransportOptions } from '@open-rpc/server-js/build/transports'
 import { spanError, spanOK, startActiveTrace } from '../proxy-server/telemetry'
 import { type Span } from '@opentelemetry/api'
+import { type Auth } from './static-types'
+import assert from 'assert'
 
 interface TransportConfig {
   type: TransportNames
   options: TransportOptions
 }
 export async function startServer (app: Express): Promise<void> {
+  assert(app, 'app must be defined')
+  assert(process.env.JSON_RPC_HTTP_PORT || process.env.JSON_RPC_SOCKETS_PORT, 'env variables JSON_RPC_HTTP_PORT or JSON_RPC_SOCKETS_PORT must be defined')
   await startActiveTrace(import.meta.url, async (span: Span) => {
     try {
       const methodMapping: MethodMapping = {
-        query: async (operationName: string, query: string, variables: Record<string, any>, secret: string): Promise<FormattedExecutionResult> => {
+        query: async (operationName: string, query: string, variables: Record<string, any>, auth: Auth): Promise<FormattedExecutionResult> => {
           variables = variables ?? {}
-          const headers = { 'x-hasura-admin-secret': secret }
+          const headers = { ...auth, 'json-rpc': true }
           return await new Promise<FormattedExecutionResult>((resolve, _reject) => {
             executeGraphQLQuery(app)({
               operationName,

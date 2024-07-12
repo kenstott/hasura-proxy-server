@@ -8,7 +8,7 @@
   "servers": [
     {
       "name": "json rpc graphql server",
-      "url": "http://${server}:${port}/${basePath}/",
+      "url": "${server}:${port}/${basePath}/",
       "variables": {
         "server": {
           "default": "<%= server %>",
@@ -30,7 +30,13 @@
         { "name": "operationName", "required": true, "schema": { "type": "string" } },
         { "name": "query", "required": true, "schema": { "type": "string" } },
         { "name": "variables", "schema" : { "type": "object" } },
-        { "name": "secret", "schema" : { "type": "string" } }
+        { "name": "auth", "schema" : { "type": "object", "properties": {
+        "x-hasura-admin-secret": { "type": "string" },
+        "basicAuth": { "type": "string" },
+        "username": { "type": "string" },
+        "password": { "type": "string" },
+        "jwt": { "type": "string" }
+        } } }
       ],
       "result": {
          "name": "result",
@@ -38,13 +44,14 @@
             "type": "object",
             "properties": {
                "data": { "$ref": "#/components/schemas/query_root" },
-               "errors": { "type": "object" },
+               "errors": { "type": "array", "items": { "$ref": "#/components/schemas/GraphQLError"} },
                "extensions": { "type": "object" }
             }
          }
       }
     }
   ],
+
   "components": {
      "schemas": <%= components %>
   }

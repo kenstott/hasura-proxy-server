@@ -46,6 +46,7 @@
     "deep-diff": "^1.0.2",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-openapi-validator": "^5.2.0",
     "flat": "^6.0.1",
     "google-protobuf": "^3.21.2",
     "gql-to-json-schema": "^1.0.1",
@@ -58,6 +59,7 @@
     "object-hash": "^3.0.0",
     "pb-util": "^1.0.3",
     "python-shell": "^5.0.0",
+    "swagger-ui-express": "^5.0.1",
     "ts-deepmerge": "^7.0.0",
     "uuid": "^9.0.1",
     "wordnet": "^2.0.0"
@@ -72,6 +74,7 @@
     "@types/lodash": "^4.17.0",
     "@types/node": "^20.12.2",
     "@types/object-hash": "^3.0.6",
+    "@types/swagger-ui-express": "^4.1.6",
     "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^7.5.0",
     "@vercel/ncc": "^0.38.1",

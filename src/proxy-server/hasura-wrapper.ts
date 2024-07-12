@@ -11,6 +11,7 @@ import _ from 'lodash'
 import { generateProtoFromSdl } from '../grpc/generate-proto-from-sdl'
 import * as fs from 'fs'
 import { generateJsonSchemaFromSdl } from '../json-rpc/generate-json-schema-from-sdl'
+import { generateRestifiedSchemaFromSdl } from '../restified/generate-restified-schema-from-sdl'
 
 interface HasuraWrapperOptions {
   uri: URL
@@ -43,6 +44,7 @@ export const hasuraWrapper = async ({ uri, adminSecret, hasuraPlugins, httpServe
     const schema = await createSchema({ uri, adminSecret, hasuraPlugins, httpServer })
     fs.writeFileSync('./proto/graphql.proto', generateProtoFromSdl(schema))
     fs.writeFileSync(process.env.JSON_RPC_SPEC_PATH ?? './json-rpc/graphql.rpc-spec', generateJsonSchemaFromSdl(schema))
+    fs.writeFileSync(process.env.OPENAPI_SPEC ?? './restified-openapi-spec/openapi.spec', generateRestifiedSchemaFromSdl(schema))
     const hasuraProxyPlugin = await createHasuraProxyPlugin(hasuraPlugins.map(i => i.operationDirective ?? '').filter(Boolean), uri.toString())
     const plugins = [
       ApolloServerPluginDrainHttpServer({ httpServer }),

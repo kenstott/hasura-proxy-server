@@ -2,3 +2,4 @@
 /dist/
 /.venv/
 .env
+/json-rpc/graphql.rpc-spec

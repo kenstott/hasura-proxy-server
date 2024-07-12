@@ -8,6 +8,7 @@ import { executeGraphQLQuery } from './execute-graph-ql-query'
 import { type FormattedExecutionResult } from 'graphql/execution'
 import { spanError, spanOK, startActiveTrace } from '../proxy-server/telemetry'
 import type { Span } from '@opentelemetry/api'
+import assert from 'assert'
 
 interface ServiceCall {
   metadata: {
@@ -18,6 +19,8 @@ interface ServiceCall {
 type Callback = (_: null, response: FormattedExecutionResult) => void
 
 export const startServer = async (app: Express): Promise<void> => {
+  assert(app, 'app must be defined')
+  assert(process.env.PROTO_PATH, 'env var PROTO_PATH must be defined')
   await startActiveTrace(import.meta.url, async (span: Span) => {
     try {
       if (!fs.existsSync(process.env.PROTO_PATH || '')) {

@@ -12,6 +12,8 @@ import * as http from 'http'
 import { type Span } from '@opentelemetry/api'
 import cors from 'cors'
 import { dataProducts } from '../routes/data-products.js'
+import swaggerUi from 'swagger-ui-express'
+import fs from 'fs'
 
 /**
  * @description Abstracts away all details of instantiating the Apollo Server as a Hasura Proxy.
@@ -36,12 +38,14 @@ export const startServer = async (hasuraPlugins: HasuraPlugin[]) => {
 
     const app = express()
     const httpServer = http.createServer(app)
+    const swaggerDoc = JSON.parse(fs.readFileSync('./restified-openapi-spec/openapi.spec').toString('utf-8'))
     app.use(cors())
     const server = new ApolloServer<HasuraContext>({
       ...await hasuraWrapper({ uri, adminSecret, hasuraPlugins, httpServer })
     })
     await server.start()
 
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
     app.get('/', (req, res, _next) => {
       if (req.url === '/') {
         res.redirect('/graphql')
@@ -92,6 +96,7 @@ export const startServer = async (hasuraPlugins: HasuraPlugin[]) => {
       const json = await response.json()
       res.json(json)
     }) as RequestHandler)
+
     const errorHandler: ErrorRequestHandler = (err: { code: string }, req, res, _next) => {
       // special case for file download requests - when apollo server is still trying
       // to send response

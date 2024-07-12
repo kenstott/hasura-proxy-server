@@ -31,10 +31,14 @@ export function executeGraphQLQuery (app: Express) {
       send: function (data: string) {
         const parseData = JSON.parse(data) as FormattedExecutionResult
         if (parseData.extensions) {
-          parseData.extensions = struct.encode(parseData.extensions as JsonObject) as ObjMap<unknown>
+          if (!this.header['json-rpc']) {
+            parseData.extensions = struct.encode(parseData.extensions as JsonObject) as ObjMap<unknown>
+          }
         }
         if (parseData.errors) {
-          parseData.errors = parseData.errors.map(i => struct.encode(i as unknown as JsonObject) as GraphQLFormattedError)
+          if (!this.header['json-rpc']) {
+            parseData.errors = parseData.errors.map(i => struct.encode(i as unknown as JsonObject) as GraphQLFormattedError)
+          }
         }
         callback(null, parseData)
       }
