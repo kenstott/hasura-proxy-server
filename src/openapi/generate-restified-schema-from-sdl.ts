@@ -1,4 +1,4 @@
-import { type GraphQLSchema, Kind, type TypeNode } from 'graphql'
+import { type GraphQLSchema, Kind, type OperationDefinitionNode, type StringValueNode, type TypeNode } from 'graphql'
 import _ from 'lodash'
 import fs from 'fs'
 import { staticTypes } from '../json-rpc/static-types'
@@ -36,6 +36,12 @@ const convertType = (typeNode: TypeNode): any => {
   }
 }
 
+/**
+ * Generates a RESTified OpenAPI specification from a given GraphQL schema.
+ *
+ * @param {GraphQLSchema} schema - The GraphQL schema to generate the specification from.
+ * @returns {string} - The generated RESTified OpenAPI specification as a string.
+ */
 export const generateRestifiedSchemaFromSdl = (schema: GraphQLSchema): string => {
   assert(process.env.RESTIFIED_OPS)
   const { definitions } = JSON.parse(fs.readFileSync('./restified-openapi-spec/graphql-schema.json').toString('utf-8'))
@@ -50,13 +56,16 @@ export const generateRestifiedSchemaFromSdl = (schema: GraphQLSchema): string =>
       for (const filename of files) {
         const opName = path.parse(filename).name
         const gqlOp = fs.readFileSync(path.resolve(filePath, filename)).toString('utf-8')
-        const opParsed = gql(gqlOp)
+        const query = gql(gqlOp)
+        const queryOp = query.definitions.find((i) => i.kind === Kind.OPERATION_DEFINITION) as OperationDefinitionNode
+        const summary = (queryOp?.directives?.find((i) => i.name.value === 'comment')?.arguments?.find((i) => i.name.value === 'text')?.value as StringValueNode)?.value
         const request = {
           [`/v1/${servicePath ? servicePath + '/' : ''}${opName}`]: {
             get: {
-              summary: gqlOp,
+              summary,
+              description: '<pre>' + gqlOp + '</pre>',
               tags: [servicePath.length ? servicePath : 'Root'],
-              parameters: opParsed.definitions.reduce<Array<Record<string, any>>>((acc, i) => {
+              parameters: query.definitions.reduce<Array<Record<string, any>>>((acc, i) => {
                 if (i.kind === 'OperationDefinition' && i.variableDefinitions !== undefined) {
                   for (const variable of i.variableDefinitions) {
                     acc.push({
@@ -94,10 +103,13 @@ export const generateRestifiedSchemaFromSdl = (schema: GraphQLSchema): string =>
       for (const filename of files) {
         const opName = path.parse(filename).name
         const gqlOp = fs.readFileSync(path.resolve(filePath, filename)).toString('utf-8')
-        const opParsed = gql(gqlOp)
+        const query = gql(gqlOp)
+        const queryOp = query.definitions.find((i) => i.kind === Kind.OPERATION_DEFINITION) as OperationDefinitionNode
+        const summary = (queryOp?.directives?.find((i) => i.name.value === 'comment')?.arguments?.find((i) => i.name.value === 'text')?.value as StringValueNode)?.value
         const request = requests[`/v1/${servicePath ? servicePath + '/' : ''}${opName}`] || {}
         request.post = {
-          summary: gqlOp,
+          summary,
+          description: '<pre>' + gqlOp + '</pre>',
           tags: [servicePath.length ? servicePath : 'Root'],
           parameters: [],
           requestBody: {
@@ -105,7 +117,7 @@ export const generateRestifiedSchemaFromSdl = (schema: GraphQLSchema): string =>
               'application/json': {
                 schema: {
                   type: 'object',
-                  properties: opParsed.definitions.reduce<Record<string, any>>((acc, i) => {
+                  properties: query.definitions.reduce<Record<string, any>>((acc, i) => {
                     if (i.kind === 'OperationDefinition' && i.variableDefinitions !== undefined) {
                       for (const variable of i.variableDefinitions) {
                         acc = { ...acc, [variable.variable.name.value]: { type: 'integer' } }

@@ -1,6 +1,14 @@
 // Extract the logic into a separate function
 import { plugin } from '../../plugin-builder/index.js'
-import { Kind, parse, visit, print, type OperationDefinitionNode, type DirectiveNode, type ValueNode } from '../../common/index.js'
+import {
+  type DirectiveNode,
+  Kind,
+  type OperationDefinitionNode,
+  parse,
+  print,
+  type ValueNode,
+  visit
+} from '../../common/index.js'
 import { AUTO_DIRECTIVES } from '../../proxy-server/config.js'
 
 const convertValue = (i: ValueNode): null | string => {
@@ -64,7 +72,8 @@ export const autoDirectivePlugin = plugin({
   }
 })
 
-export interface AutoDirectivePluginArgs {}
+export interface AutoDirectivePluginArgs {
+}
 
 export default autoDirectivePlugin
 export { autoDirectivePlugin as plugin }

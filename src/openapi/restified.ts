@@ -1,4 +1,4 @@
-import express, { type Express, type Request, type Response, type NextFunction } from 'express'
+import express, { type Express, type NextFunction, type Request, type Response } from 'express'
 import fs from 'fs'
 import path from 'path'
 import gql from 'graphql-tag'

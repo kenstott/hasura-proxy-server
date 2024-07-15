@@ -71,7 +71,8 @@ When you run the query you will get this added to the extensions section of the 
 
 ## Options
 
-The plugin can optionally write the anomaly trace to a mongodb collection, to simplify reporting. In order to write to MongoDB a valid
+The plugin can optionally write the anomaly trace to a mongodb collection, to simplify reporting. In order to write to
+MongoDB a valid
 MongoDB connection string must be provided as an environment variable named: `MONGODB_CONNECTION_STRING`
 
 ## Parameters
@@ -147,7 +148,8 @@ If you have setup the MongoDB trace exporter, retain will be recorded like this:
 
 ## Related Plugins
 
-[sample-plugin](../sample-plugin/README.md). When retaining a large dataset, and the sole interest is in retaining the data, you can sample the
+[sample-plugin](../sample-plugin/README.md). When retaining a large dataset, and the sole interest is in retaining the
+data, you can sample the
 original dataset to a smaller sample record set using this plugin, while still retaining the entire dataset.
 
 [field-tracking-plugin](../field-tracking-plugin/README.md). This plugin is automatically invoked.

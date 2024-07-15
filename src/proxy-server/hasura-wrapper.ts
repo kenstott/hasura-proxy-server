@@ -63,8 +63,8 @@ export const hasuraWrapper = async ({ uri, adminSecret, hasuraPlugins, httpServe
 
 export const createSchema = async ({ uri, adminSecret, hasuraPlugins }: HasuraWrapperOptions): Promise<GraphQLSchema> => {
   const typeDefs =
-      'directive @comment(text: String) on FIELD_DEFINITION | OBJECT | QUERY | MUTATION\n' +
-      hasuraPlugins.map(i => `
+        'directive @comment(text: String) on FIELD | FIELD_DEFINITION | OBJECT | QUERY | MUTATION\n' +
+        hasuraPlugins.map(i => `
     ${i.operationDirectiveHelp ? '"""' + i.operationDirectiveHelp + '"""' : ''}
     ${i.operationDirective ? 'directive ' + i.operationDirective.replace(/\n/g, ' ') + ' on QUERY' : ''}
     ${i.additionalSDL ?? ''}

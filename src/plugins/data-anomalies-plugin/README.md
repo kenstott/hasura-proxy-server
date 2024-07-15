@@ -148,7 +148,8 @@ Will create traces in this format:
 
 ```
 
-Note the extensions attribute. There will be a single trace for each query. Each root query will have an attribute with suspicious records in a stringified JSON.
+Note the extensions attribute. There will be a single trace for each query. Each root query will have an attribute with
+suspicious records in a stringified JSON.
 
 ## MongoDB Trace Log
 
@@ -158,18 +159,20 @@ If you have setup the MongoDB trace exporter, anomalies will be recorded like th
 
 ## Related Plugins
 
-[sample-plugin](../sample-plugin/README.md). When evaluating a large dataset, and the sole interest is in understanding errors, you can sample the
+[sample-plugin](../sample-plugin/README.md). When evaluating a large dataset, and the sole interest is in understanding
+errors, you can sample the
 original dataset to a smaller sample record set using this plugin, while still evaluating the entire dataset.
 
 [field-tracking-plugin](../field-tracking-plugin/README.md). This plugin is automatically invoked.
 
 ## Design Considerations
 
-This plugin leverages Python. ML libraries in Python are very mature. But to take advantage of Python you must be able move 
-data from NodeJS/Deno to Python efficiently. They can't share the same memory space. To do this, we used Apache Arrow. 
-On the Typescript side we used their Arquero library to flatten and serialize into Arrow File Format, and then pushed 
-the Arrow File to Python. Python then used pyarrow to convert into a numpy array, compute the scores, 
-generate results in an Arrow File, and then push them back to NodeJS/Deno. 
+This plugin leverages Python. ML libraries in Python are very mature. But to take advantage of Python you must be able
+move
+data from NodeJS/Deno to Python efficiently. They can't share the same memory space. To do this, we used Apache Arrow.
+On the Typescript side we used their Arquero library to flatten and serialize into Arrow File Format, and then pushed
+the Arrow File to Python. Python then used pyarrow to convert into a numpy array, compute the scores,
+generate results in an Arrow File, and then push them back to NodeJS/Deno.
 
 Arrow's zero-copy technology drastically reduces serialization/deserialization time, almost completely eliminating it.
 Making performance excellent.

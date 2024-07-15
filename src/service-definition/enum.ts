@@ -9,7 +9,6 @@ interface IEnum {
  * @implements {IEnum}
  */
 export class Enum implements IEnum {
-  _name: string
   values: Record<string, string | number>
   descriptions?: Record<string, string | null>
 
@@ -18,6 +17,8 @@ export class Enum implements IEnum {
     this.descriptions = props.descriptions
     this.values = props.values
   }
+
+  _name: string
 
   get name (): string {
     return this._name

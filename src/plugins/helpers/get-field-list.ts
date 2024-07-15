@@ -28,4 +28,7 @@ export const getFieldList = (query: DocumentNode, schema: GraphQLSchema): {
   }
 }
 
-export const getSelectionSetHash = (query: string, schema: GraphQLSchema): string => objectHash(getFieldList(gql(query), schema).list, { algorithm: 'sha256', encoding: 'base64' })
+export const getSelectionSetHash = (query: string, schema: GraphQLSchema): string => objectHash(getFieldList(gql(query), schema).list, {
+  algorithm: 'sha256',
+  encoding: 'base64'
+})

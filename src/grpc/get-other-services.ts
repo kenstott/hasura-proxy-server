@@ -14,7 +14,8 @@ export const getOtherServices = async (app: Express, server: grpc.Server, graphq
     const restOp = path.basename(filePath)
     const services = {}
     if (['get', 'post'].includes(restOp)) {
-      const servicePath = path.parse(filePath).dir.replace(basePath, '').split(/[/\\]/).slice(1).join('__')
+      const servicePath = path.parse(filePath).dir.replace(basePath, '')
+        .split(/[/\\]/).slice(1).join(process.env.JSON_RPC_PATH_SEPARATOR || '__')
       if (servicePath.length) {
         const service = (graphqlProto[servicePath + 'Service'] as grpc.ServiceClientConstructor).service
         const files = fs.readdirSync(filePath).filter((i) => i.toLowerCase().endsWith('.gql'))

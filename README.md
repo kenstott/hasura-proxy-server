@@ -2,7 +2,7 @@
 
 Add new features and capabilities to an existing Hasura GraphQL endpoint using the Hasura Proxy Server.
 
-For example, field-level traces, data validation, data profiling, and naming standards enforcement are all simple and easy to do with the hasura-proxy-server.
+For example, gRPC, JSON-RPC, file formats, field-level traces, data validation, data profiling, and naming standards enforcement are all simple and easy to do with the hasura-proxy-server.
 
 The HGE is a phenomenal low-code product that lets you generate GraphQL endpoints at a fraction of the cost
 of many other tools.
@@ -205,6 +205,60 @@ Just like calling GraphQL on an HTTP POST, you supply an operationName, query, a
 JSON-RPC validates on each call - you validate by adding a 'secret' variable equal to the `x-hasura-admin-secret`.
 
 It returns the value in same format as standard GraphQL result.
+
+#### RPC'd Parameterized Queries
+
+Parameterized queries are automatically generated as OpenAPI, gRPC and JSON-RPC endpoints.
+
+Locate parameterized query `.gql ` files in this location `process.env.RESTIFIED_OPS`. 
+files must be placed under a `get` or `post` subdirectory. You can also nest the files.
+Nested files will attempt to recreate a similar structure in the RPC. For example:
+
+```
+/ops
+   shopping
+     get
+       findStores
+       findProducts
+```
+
+Would, in grpc be placed in a Service named `shoppingService`, with 2 RPC's, 
+`findStores` and `findProducts`
+
+A parameterized query file might look like:
+
+```graphql
+query findStores($limit: Int! = 10, $where: Stores_bool_exp) {
+    Stores(limit: $limit, where: $where) {
+        storeKey
+        state
+        country
+    }
+}
+```
+
+This RPC would have 2 parameters, a required parameter `limit` with a default of value of `10` and a 
+where expression. Each query_root has its own customized where predicates, in this case
+`Stores_bool_exp` is the class of the where predicate we will parameterize.
+
+When the server starts you will have the following endpoints available:
+
+- http(s)://`SERVER_NAME`:`PORT`/api-docs
+  - ex: `http://localhost:4000/api-docs`
+  - a Swagger Doc showing all parameterized queries)
+  - ex: ![Swagger Doc Example](./docs/images/openapi.png)
+- http(s)://`SERVER_NAME`:`GRPC_PORT`
+  - ex: `http://localhost:50051`
+  - Retrieve the proto through reflection
+- http(s)://`SERVER_NAME`:`JSON_RPC_HTTP_PORT`/`JSON_RPC_BASEPATH`
+  - ex: `http://localhost/3330/jsonrpc`
+  - Retrieve documentation via reflection (use `https://playground.open-rpc.org/`)
+- ws(s)://`SERVER_NAME`:`JSON_RPC_SOCKETS_PORT`
+  - ex: `ws://localhost/3331`
+  - Retrieve documentation via reflection (use `https://playground.open-rpc.org/`)
+
+Insomnia and Postman both support GRPC and are good for testing RPCs.
+
 
 
 

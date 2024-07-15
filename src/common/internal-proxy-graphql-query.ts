@@ -17,7 +17,9 @@ export interface InternalProxyGraphQLQuery {
   headers: Record<string, unknown>
   callback: (_: null, response: { data?: any, errors?: any, extensions?: any } | any) => void
 }
+
 export type InternalProxyFunction = (params: InternalProxyGraphQLQuery) => void
+
 /**
  * Creates an internal proxy GraphQL query function. It proxies to the HTTP server hosted by the app.
  *

@@ -10,7 +10,6 @@ interface IMessage {
  * Represents a message. This is an intermediate form of an object type that can generate a version for each supported RPC.
  */
 export class Message implements IMessage {
-  _name: string
   description?: string
   fields: Field[]
 
@@ -19,6 +18,8 @@ export class Message implements IMessage {
     this.description = props.description
     this.fields = props.fields.map(i => new Field(i))
   }
+
+  _name: string
 
   get name (): string {
     return this._name
@@ -34,8 +35,8 @@ export class Message implements IMessage {
 
   print (): string {
     return `message ${this.name} {` + '\n' +
-        this.fields.map((i, index) => '   ' + i.print(index + 1)).join('\n') +
-        '\n}\n'
+            this.fields.map((i, index) => '   ' + i.print(index + 1)).join('\n') +
+            '\n}\n'
   }
 
   jsonSchema (): Record<string, any> {

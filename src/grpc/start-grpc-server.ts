@@ -14,7 +14,8 @@ import { getOtherServices } from './get-other-services.js'
 
 export interface ServiceCall {
   metadata: {
-    getMap: () => Record<string, unknown> }
+    getMap: () => Record<string, unknown>
+  }
   request: { operationName: any, query: any, variablesStruct: any, variablesString: any }
 }
 

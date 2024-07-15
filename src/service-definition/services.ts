@@ -32,7 +32,10 @@ export const generateServices = (): {
   traverseDirectories(basePath, (filePath: string, _stat: fs.Stats) => {
     const restOp = path.basename(filePath)
     if (['get', 'post'].includes(restOp)) {
-      const servicePath = path.parse(filePath).dir.replace(basePath, '').split(/[/\\]/).slice(1).join('__')
+      const servicePath = path.parse(filePath).dir.replace(basePath, '')
+        .split(/[/\\]/)
+        .slice(1)
+        .join(process.env.JSON_RPC_PATH_SEPARATOR || '__')
       const files = fs.readdirSync(filePath).filter((i) => i.toLowerCase().endsWith('.gql'))
       for (const filename of files) {
         const opName = path.parse(filename).name

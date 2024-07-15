@@ -1,6 +1,9 @@
-query findSalesAndExchangeRates($where: Sales_bool_exp, $orderBy: [Sales_order_by!] = [{deliveryDate: asc}], $limit: Int = 10, $offset: Int = 10)  @comment(text: "this is a test") {
-    Sales(where: $where, order_by: $orderBy, limit: $limit, offset: $offset) @comment(text: "sales text") {
-        currencyCode  @comment(text: "currency code text")
+query findSalesAndExchangeRates($where: Sales_bool_exp, $orderBy: [Sales_order_by!] = [{deliveryDate: asc}], $limit: Int = 10, $offset: Int = 10)
+@comment(text: "Intended for use in AML/KYC regulatory reporting.") {
+    Sales(where: $where, order_by: $orderBy, limit: $limit, offset: $offset)
+        @comment(text: "Critical in determining profitability for foreign transactions.") {
+        currencyCode
+        @comment(text: "Anti-money laundering uses this.")
         customerKey
         deliveryDate
         lineItem
@@ -9,7 +12,7 @@ query findSalesAndExchangeRates($where: Sales_bool_exp, $orderBy: [Sales_order_b
         productKey
         quantity
         storeKey
-        exchangeRates {
+        exchangeRates(limit: 1) {
             currency
             date
             exchange

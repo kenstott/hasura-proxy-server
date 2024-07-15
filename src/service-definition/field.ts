@@ -1,3 +1,5 @@
+import { type JSONSchema7 } from 'json-schema'
+
 const jsonSchemaTypeMap = {
   int32: 'integer',
   string: 'string',
@@ -11,10 +13,9 @@ const protobufSubstitutionsMap = {
   object: 'google.protobuf.Struct'
 }
 
-export const mapJsonSchemaType = (t: string, description?: string): Record<string, string | Record<string, string>> => {
+export const mapJsonSchemaType = (t: string, description?: string): JSONSchema7 => {
   if (t.startsWith('repeated ')) {
     return {
-      description: description || '',
       type: 'array',
       items: {
         $ref: `#/components/schemas/${t.replace('repeated ', '')}`
@@ -32,6 +33,7 @@ export const mapJsonSchemaType = (t: string, description?: string): Record<strin
     $ref: `#/components/schemas/${t}`
   }
 }
+
 export interface IField {
   name?: string
   type?: string
@@ -47,29 +49,17 @@ export interface IField {
  * @implements {IField}
  */
 export class Field implements IField {
-  get repeated (): boolean | undefined {
-    return this._repeated
+  description?: string
+
+  constructor (props: Partial<IField>) {
+    this._name = props.name
+    this._type = props.type
+    this._required = props.required
+    this._repeated = props.repeated
+    this.description = props.description
   }
 
-  set repeated (value: boolean) {
-    this._repeated = value
-  }
-
-  get required (): boolean | undefined {
-    return this._required
-  }
-
-  set required (value: boolean) {
-    this._required = value
-  }
-
-  get type (): string | undefined {
-    return this._type
-  }
-
-  set type (value: string) {
-    this._type = value
-  }
+  private _name?: string
 
   get name (): string | undefined {
     return this._name
@@ -79,18 +69,34 @@ export class Field implements IField {
     this._name = value
   }
 
-  private _name?: string
   private _type?: string
-  private _required?: boolean
-  private _repeated?: boolean
-  description?: string
 
-  constructor (props: Partial<IField>) {
-    this._name = props.name
-    this._type = props.type
-    this._required = props.required
-    this._repeated = props.repeated
-    this.description = props.description
+  get type (): string | undefined {
+    return this._type
+  }
+
+  set type (value: string) {
+    this._type = value
+  }
+
+  private _required?: boolean
+
+  get required (): boolean | undefined {
+    return this._required
+  }
+
+  set required (value: boolean) {
+    this._required = value
+  }
+
+  private _repeated?: boolean
+
+  get repeated (): boolean | undefined {
+    return this._repeated
+  }
+
+  set repeated (value: boolean) {
+    this._repeated = value
   }
 
   print (fieldNumber: number): string {

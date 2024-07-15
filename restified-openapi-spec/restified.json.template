@@ -20,14 +20,6 @@
       "post": {
         "summary": "Execute a GraphQL query",
         "tags": ["GraphQL"],
-        "parameters": [
-          {"in": "header",
-            "name": "X-Hasura-Admin-Secret",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
        "requestBody": {
           "required": true,
           "content": {

@@ -1,5 +1,5 @@
 import { MongoClient, type SortDirection, type WithId } from 'mongodb'
-import { type TypeFieldPair, type ObjMap } from '../helpers/index.js'
+import { type ObjMap, type TypeFieldPair } from '../helpers/index.js'
 import _ from 'lodash'
 import { type VariableValues } from '../../plugin-builder/index.js'
 import diff from 'deep-diff'
@@ -27,6 +27,7 @@ interface HistoricalRecordMetadata extends Record<string, unknown> {
   query: string
   root: string
 }
+
 interface HistoricalRecord extends Record<string, unknown> {
   _timestamp: Date
   metadata: HistoricalRecordMetadata

@@ -3,7 +3,15 @@ import { type ExportResult, ExportResultCode } from '../common/problem-imports.j
 import { MongoClient } from 'mongodb'
 import _ from 'lodash'
 import { stringify } from 'flatted'
-type MongoDBSpan = ReadableSpan & { traceId: string, spanId: string, isRemote?: boolean, traceFlags: number, timestamp: Date }
+
+type MongoDBSpan = ReadableSpan & {
+  traceId: string
+  spanId: string
+  isRemote?: boolean
+  traceFlags: number
+  timestamp: Date
+}
+
 interface MongoDbTraceExporterOptions {
   connectionString?: string
   toConsole?: boolean
@@ -11,6 +19,7 @@ interface MongoDbTraceExporterOptions {
   rewriter?: (span: ReadableSpan) => MongoDBSpan
   omitFields?: string[]
 }
+
 const defaultRewriter = (span: ReadableSpan): MongoDBSpan => {
   if (span.attributes?.extensionJson) {
     span.attributes.extension = JSON.parse(span.attributes.extensionJson as string)
@@ -30,10 +39,10 @@ const defaultOmitFields = ['_spanContext', 'instrumentationLibrary', 'resource',
   '_performanceStartTime', '_performanceOffset', '_startTimeProvided']
 
 export class MongoTraceExporter implements SpanExporter {
+  private static readonly _defaultOmitFields: string[] = defaultOmitFields
   private readonly db: MongoClient
   private readonly toConsole: boolean
   private readonly rewriter: (span: ReadableSpan) => MongoDBSpan = defaultRewriter
-  private static readonly _defaultOmitFields: string[] = defaultOmitFields
   private readonly omitFields = MongoTraceExporter._defaultOmitFields
 
   constructor ({ toConsole, connectionString, filter, rewriter, omitFields }: MongoDbTraceExporterOptions) {
@@ -44,6 +53,10 @@ export class MongoTraceExporter implements SpanExporter {
     this.filter = filter || this.filter
     this.rewriter = rewriter || this.rewriter
     this.omitFields = MongoTraceExporter._defaultOmitFields || omitFields
+  }
+
+  get defaultOmitFields (): string[] {
+    return MongoTraceExporter._defaultOmitFields
   }
 
   export (spans: any[], resultCallback: (result: ExportResult) => void): void {
@@ -79,8 +92,4 @@ export class MongoTraceExporter implements SpanExporter {
   }
 
   private readonly filter = (span: ReadableSpan): boolean => !!span
-
-  get defaultOmitFields (): string[] {
-    return MongoTraceExporter._defaultOmitFields
-  }
 }

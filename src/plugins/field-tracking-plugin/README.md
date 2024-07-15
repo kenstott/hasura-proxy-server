@@ -8,6 +8,7 @@ back to the data source. So, it's important to have the Object Type and field fo
 This may have been resolved in Hasura v3, and may be an unnecessary plug-in if proxying to a v3 instance.
 
 Sample Trace:
+
 ```json
 {
   "traceId": "6e689b16b49d61d86a366d612ec8bfe0",

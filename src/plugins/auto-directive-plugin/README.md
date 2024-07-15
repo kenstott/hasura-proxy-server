@@ -1,6 +1,7 @@
 # sample-plugin
 
-This plugin reduce the original dataset to subset. But any analysis plugins continue to operate against the full dataset.
+This plugin reduce the original dataset to subset. But any analysis plugins continue to operate against the full
+dataset.
 
 It should be placed after any analysis plugins - since the original dataset is truncated once this plug-in runs.
 

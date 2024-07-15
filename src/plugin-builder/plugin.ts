@@ -1,19 +1,20 @@
 import {
+  type DirectiveNode,
   type FormattedExecutionResult,
   type GraphQLSchema,
   type HasuraContext,
   type HasuraPlugin,
   Kind,
-  type OperationDefinitionNode,
-  type DirectiveNode
+  type OperationDefinitionNode
 } from '../common/index.js'
 import { getDirectiveArgs, getDirectiveAttributes } from './get-directive-args.js'
 import { type Attributes, type Span } from '@opentelemetry/api'
 import { startActiveTrace } from '../proxy-server/telemetry.js'
 import {
-  type GraphQLResponse,
+  type GraphQLRequest,
   type GraphQLRequestContextDidResolveOperation,
-  type GraphQLRequestContextResponseForOperation, type GraphQLRequest
+  type GraphQLRequestContextResponseForOperation,
+  type GraphQLResponse
 } from '@apollo/server'
 import { addToExtensions } from './add-extensions.js'
 import { addToErrors } from './add-errors.js'
@@ -124,8 +125,8 @@ export const plugin = ({
           await startActiveTrace(import.meta.url, async (span) => {
             if (response.body.kind === 'single') {
               const directive: DirectiveNode | undefined =
-                  operation?.directives?.find((i: DirectiveNode) => i.name.value === operationDirectiveName) ||
-                  contextValue.revisedOperation?.directives?.find((i: DirectiveNode) => i.name.value === operationDirectiveName)
+                                operation?.directives?.find((i: DirectiveNode) => i.name.value === operationDirectiveName) ||
+                                contextValue.revisedOperation?.directives?.find((i: DirectiveNode) => i.name.value === operationDirectiveName)
               if (directive !== undefined || !operationDirectiveName) {
                 const userID = http?.headers.get('x-hasura-user-id') ?? ''
                 const directiveArgs = getDirectiveAttributes(directive, argDefaults)

@@ -30,7 +30,10 @@ export const generateFieldFromType = ({
   type,
   field,
   messages = {}
-}: ParamsStruct): { field: Partial<Field>, supportingMessages: Record<string, Partial<Message | Enum>> } => {
+}: ParamsStruct): {
+  field: Partial<Field>
+  supportingMessages: Record<string, Partial<Message | Enum>>
+} => {
   field.name = name
   if (isNonNullType(type)) {
     const response = generateFieldFromType({ name, type: type.ofType, field, messages })

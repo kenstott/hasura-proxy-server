@@ -11,7 +11,7 @@ import { type Span } from '@opentelemetry/api'
 import assert from 'assert'
 import _ from 'lodash'
 import { getMethodMapping } from './get-method-mapping.js'
-import { generateServices } from '../service-definition/index.js'
+import { generateServices, type JsonRPC } from '../service-definition/index.js'
 
 interface TransportConfig {
   type: TransportNames
@@ -24,13 +24,13 @@ export async function startServer (app: Express): Promise<void> {
   await startActiveTrace(import.meta.url, async (span: Span) => {
     try {
       const { services: serviceResponse } = generateServices()
-      const methods = _.flatten<Record<string, any>>((Object.entries(serviceResponse)
-        .map(([_service, rpcs]) =>
-          Object.entries(rpcs).map(([_rpcName, rpc]) => rpc.jsonRpc())) as never[]))
+      const methods: JsonRPC[] = _.flatten<JsonRPC>((Object.entries(serviceResponse)
+        .map(([_service, remoteProcedureCalls]) =>
+          Object.entries(remoteProcedureCalls).map(([_rpcName, rpc]) => rpc.jsonRpc()))))
       const methodMapping: MethodMapping = getMethodMapping(app, methods)
       const spec =
-          fs.readFileSync(process.env.JSON_RPC_SPEC_PATH ?? './json-rpc/graphql.rpc-spec')
-            .toString('utf-8')
+                fs.readFileSync(process.env.JSON_RPC_SPEC_PATH ?? './json-rpc/graphql.rpc-spec')
+                  .toString('utf-8')
 
       const openrpcDocument = await parseOpenRPCDocument(spec, { dereference: false })
       const transportConfigs: TransportConfig[] = []

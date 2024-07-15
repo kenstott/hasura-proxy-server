@@ -98,7 +98,7 @@ export const startServer = async (hasuraPlugins: HasuraPlugin[]): Promise<Expres
       // to send response
       if (req.url.includes('gql') && err.code === 'ERR_HTTP_HEADERS_SENT') {
         res.status(200)
-      // otherwise ignore
+        // otherwise ignore
       } else {
         res.status(500)
       }

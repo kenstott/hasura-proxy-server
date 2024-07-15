@@ -7,6 +7,7 @@ if (typeof Deno !== 'undefined') {
 } else {
   config({ path: '.env' })
 }
+
 export const {
   HASURA_URI,
   HASURA_ADMIN_SECRET,
@@ -17,5 +18,12 @@ export const {
   MONGODB_CONNECTION_STRING,
   MONGODB_TO_CONSOLE,
   MONGODB_TRACE_FILTERS,
-  AUTO_DIRECTIVES
+  AUTO_DIRECTIVES,
+  JSON_RPC_BASEPATH,
+  JSON_RPC_HTTP_PORT,
+  JSON_RPC_PATH_SEPARATOR,
+  JSON_RPC_SERVER,
+  JSON_RPC_SOCKETS_PORT,
+  JSON_RPC_SPEC_PATH,
+  GRPC_PORT
 } = altProcess.env

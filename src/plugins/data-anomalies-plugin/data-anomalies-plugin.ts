@@ -78,7 +78,15 @@ export const dataAnomaliesPlugin = plugin({
       const operationName = ctxArgs.operationName
       const selectionSetHash = getSelectionSetHash(ctxArgs.query, schema)
       const getAnomalousRecords = new GetAnomalousRecords('./.venv/bin/python3')
-      const anomalies = await getAnomalousRecords.getScores({ data: singleResult.data, threshold, modelOut, modelIn, modelInData, selectionSetHash, operationName })
+      const anomalies = await getAnomalousRecords.getScores({
+        data: singleResult.data,
+        threshold,
+        modelOut,
+        modelIn,
+        modelInData,
+        selectionSetHash,
+        operationName
+      })
       getAnomalousRecords.destroy()
       // Add your new data into the extensions - OR - augment the original data
       span?.setAttributes({ extensionJson: JSON.stringify(anomalies) })

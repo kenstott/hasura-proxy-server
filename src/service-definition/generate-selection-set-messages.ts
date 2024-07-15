@@ -1,10 +1,12 @@
 import {
   type GraphQLOutputType,
   type GraphQLSchema,
-  isListType, isNonNullType,
+  isListType,
+  isNonNullType,
   isObjectType,
   Kind,
-  type SelectionSetNode, type StringValueNode
+  type SelectionSetNode,
+  type StringValueNode
 } from 'graphql'
 import { Message } from './message'
 import type { Enum } from './enum'
@@ -18,13 +20,19 @@ import { Field } from './field'
 import { generateFieldFromType } from './generate-field-from-type'
 import { traverseDirectories } from '../common/traverse-directories'
 
-function generateSelectionSetObject (parentObject: Maybe<GraphQLObjectType | GraphQLOutputType>, opName: string, selectionSet: SelectionSetNode, message?: Partial<Message>, supportingMessages?: Record<string, Message>): { message: Message, supportingMessages: Record<string, Message> } {
+function generateSelectionSetObject (parentObject: Maybe<GraphQLObjectType | GraphQLOutputType>, opName: string, selectionSet: SelectionSetNode, message?: Partial<Message>, supportingMessages?: Record<string, Message>): {
+  message: Message
+  supportingMessages: Record<string, Message>
+} {
   supportingMessages = supportingMessages ?? {}
   message = message ?? new Message({ fields: [], name: opName })
   for (const field of selectionSet.selections) {
     if (field.kind === Kind.FIELD) {
       if (field.selectionSet && parentObject) {
-        const selectionSetField = new Field({ name: field.name.value, type: `${message.name}_${field.name.value}` })
+        const selectionSetField = new Field({
+          name: field.name.value,
+          type: `${message.name}_${field.name.value}`
+        })
         while (!isObjectType(parentObject)) {
           if (isListType(parentObject)) {
             parentObject = parentObject.ofType
@@ -48,7 +56,11 @@ function generateSelectionSetObject (parentObject: Maybe<GraphQLObjectType | Gra
                     field.selectionSet,
                     undefined
         )
-        supportingMessages = { ...(supportingMessages || {}), [response.message.name]: response.message, ...response.supportingMessages }
+        supportingMessages = {
+          ...(supportingMessages || {}),
+          [response.message.name]: response.message,
+          ...response.supportingMessages
+        }
         selectionSetField.description = (field.directives?.find((i) => i.name.value === 'comment')?.arguments?.find((i) => i.name.value === 'text')?.value as StringValueNode)?.value
         message.addField?.(selectionSetField)
       } else {
@@ -61,7 +73,11 @@ function generateSelectionSetObject (parentObject: Maybe<GraphQLObjectType | Gra
             parentObject = parentObject.ofType
           }
         }
-        const { field: revisedSelectionField } = generateFieldFromType({ name: field.name.value, type: parentObject?.getFields()[field.name.value].type, field: selectionSetField })
+        const { field: revisedSelectionField } = generateFieldFromType({
+          name: field.name.value,
+          type: parentObject?.getFields()[field.name.value].type,
+          field: selectionSetField
+        })
         revisedSelectionField.description = (field.directives?.find((i) => i.name.value === 'comment')?.arguments?.find((i) => i.name.value === 'text')?.value as StringValueNode)?.value
         message.addField?.(new Field(revisedSelectionField))
       }

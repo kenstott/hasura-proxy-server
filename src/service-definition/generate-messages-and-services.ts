@@ -3,7 +3,8 @@ import {
   type Enum,
   generateMessageFromObjectType,
   generateSelectionSetMessages,
-  type Message, type RemoteProcedureCall
+  type Message,
+  type RemoteProcedureCall
 } from '../service-definition/index.js'
 import { generateServices } from '../service-definition/services'
 
@@ -24,6 +25,11 @@ export const generateMessagesAndServices = (schema: GraphQLSchema): {
   const { message: queryRoot, supportingMessages } = generateMessageFromObjectType(schema.getQueryType(), {})
   const selectionSetMessages = generateSelectionSetMessages(schema)
   const { services, supportingMessages: serviceMessages } = generateServices()
-  const messages = { ...supportingMessages, ...serviceMessages, [queryRoot?.name || '']: queryRoot, ...selectionSetMessages }
+  const messages = {
+    ...supportingMessages,
+    ...serviceMessages,
+    [queryRoot?.name || '']: queryRoot,
+    ...selectionSetMessages
+  }
   return { queryRoot: queryRoot as Message, messages: messages as Record<string, Message | Enum>, services }
 }

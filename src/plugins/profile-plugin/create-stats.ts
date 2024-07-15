@@ -4,10 +4,11 @@ import { type ColumnAnalysis, ScalarType, type Stats } from '../helpers/index.js
 
 export interface Stringable {
   /**
-   * String coercion method.
-   */
+     * String coercion method.
+     */
   toString: () => string
 }
+
 export type Params = Record<string, any>
 export type TableExprString = string | Stringable
 /**

@@ -2,17 +2,18 @@ import {
   altProcess,
   ConsoleMetricExporter,
   ConsoleSpanExporter,
+  type MetricReader,
   OTLPTraceExporter,
-  PeriodicExportingMetricReader,
-  type MetricReader
+  PeriodicExportingMetricReader
 } from '../common/index.js'
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
 import { type ReadableSpan, SimpleSpanProcessor, type SpanExporter } from '@opentelemetry/sdk-trace-base'
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto'
 import { type Attributes, type Span, SpanStatusCode, trace } from '@opentelemetry/api'
 import {
-  MONGODB_CONNECTION_STRING, MONGODB_TRACE_FILTERS,
+  MONGODB_CONNECTION_STRING,
   MONGODB_TO_CONSOLE,
+  MONGODB_TRACE_FILTERS,
   OTEL_EXPORTER_OTLP_ENDPOINT,
   OTEL_SERVICE_NAME
 } from './config.js'

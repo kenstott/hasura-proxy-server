@@ -1,12 +1,16 @@
-import { type Request, type Response, type NextFunction, type RequestHandler } from 'express'
+import { type NextFunction, type Request, type RequestHandler, type Response } from 'express'
 import { getHasuraSchema } from '../proxy-server/get-hasura-schema'
 import {
-  type GraphQLType,
-  isWrappingType,
-  isObjectType,
-  isLeafType,
   type GraphQLEnumType,
-  type GraphQLObjectType, type GraphQLScalarType, type GraphQLUnionType, type GraphQLInterfaceType, type GraphQLInputObjectType
+  type GraphQLInputObjectType,
+  type GraphQLInterfaceType,
+  type GraphQLObjectType,
+  type GraphQLScalarType,
+  type GraphQLType,
+  type GraphQLUnionType,
+  isLeafType,
+  isObjectType,
+  isWrappingType
 } from 'graphql'
 
 const getWrappedType = (t: GraphQLType): GraphQLInputObjectType | GraphQLInterfaceType | GraphQLEnumType | GraphQLObjectType | GraphQLScalarType | GraphQLUnionType => {
@@ -29,13 +33,21 @@ export const dataProducts = (async (_req: Request, res: Response, _next: NextFun
       const { description } = concreteType
       if (isObjectType(concreteType)) {
         const fieldList =
-            Object.entries(concreteType.getFields())
-              .filter(([_name, field]) => isLeafType(getWrappedType(field.type)))
-              .map(([name, field]) => ({ name, description: field.description, fieldType: getWrappedType(field.type).name }))
+                        Object.entries(concreteType.getFields())
+                          .filter(([_name, field]) => isLeafType(getWrappedType(field.type)))
+                          .map(([name, field]) => ({
+                            name,
+                            description: field.description,
+                            fieldType: getWrappedType(field.type).name
+                          }))
         const relationshipList =
-            Object.entries(concreteType.getFields())
-              .filter(([_name, field]) => isObjectType(getWrappedType(field.type)))
-              .map(([name, field]) => ({ name, description: field.description, fieldType: getWrappedType(field.type).name }))
+                        Object.entries(concreteType.getFields())
+                          .filter(([_name, field]) => isObjectType(getWrappedType(field.type)))
+                          .map(([name, field]) => ({
+                            name,
+                            description: field.description,
+                            fieldType: getWrappedType(field.type).name
+                          }))
         acc = [...acc, { name, description, fieldList, relationshipList }]
       }
       return acc
