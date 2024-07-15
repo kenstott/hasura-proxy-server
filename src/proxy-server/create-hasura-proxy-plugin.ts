@@ -66,6 +66,9 @@ export const createHasuraProxyPlugin = async (directiveName: string[], hasuraUri
                     if (plainDirectiveNames.includes(node.name.value)) {
                       return null
                     }
+                    if (node.name.value === 'comment') {
+                      return null
+                    }
                     return node
                   }
                 }

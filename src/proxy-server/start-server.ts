@@ -1,5 +1,5 @@
 import { ApolloServer } from '@apollo/server'
-import express, { type Request, type RequestHandler, type ErrorRequestHandler, type Express } from 'express'
+import express, { type ErrorRequestHandler, type Express, type Request, type RequestHandler } from 'express'
 import { expressMiddleware } from '@apollo/server/express4'
 import { hasuraWrapper, reloadSchema } from './hasura-wrapper.js'
 import assert from 'assert'
@@ -12,15 +12,13 @@ import * as http from 'http'
 import { type Span } from '@opentelemetry/api'
 import cors from 'cors'
 import { dataProducts } from '../routes/data-products.js'
-import swaggerUi from 'swagger-ui-express'
-import fs from 'fs'
 
 /**
  * @description Abstracts away all details of instantiating the Apollo Server as a Hasura Proxy.
  * @param hasuraPlugins {HasuraPlugin[]} A collection of Hasura Plugins you want to apply to the results of data
  * retrieved from the call the HGE.
  */
-export const startServer = async (hasuraPlugins: HasuraPlugin[]) => {
+export const startServer = async (hasuraPlugins: HasuraPlugin[]): Promise<Express> => {
   return await startActiveTrace(import.meta.url, async (span) => {
     assert(HASURA_URI, 'Valid Hasura URI graphql endpoint is required.')
     assert(HASURA_ADMIN_SECRET, 'Valid Hasura Admin Secret is required.')
@@ -38,14 +36,12 @@ export const startServer = async (hasuraPlugins: HasuraPlugin[]) => {
 
     const app = express()
     const httpServer = http.createServer(app)
-    const swaggerDoc = JSON.parse(fs.readFileSync('./restified-openapi-spec/openapi.spec').toString('utf-8'))
     app.use(cors())
     const server = new ApolloServer<HasuraContext>({
       ...await hasuraWrapper({ uri, adminSecret, hasuraPlugins, httpServer })
     })
     await server.start()
 
-    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
     app.get('/', (req, res, _next) => {
       if (req.url === '/') {
         res.redirect('/graphql')

@@ -5,40 +5,29 @@ import { parseOpenRPCDocument } from '@open-rpc/schema-utils-js'
 import { type Express } from 'express'
 import { type MethodMapping } from '@open-rpc/server-js/build/router'
 import fs from 'fs'
-import { executeGraphQLQuery } from '../grpc/execute-graph-ql-query'
-import { type FormattedExecutionResult } from 'graphql/execution'
 import { type TransportNames, type TransportOptions } from '@open-rpc/server-js/build/transports'
 import { spanError, spanOK, startActiveTrace } from '../proxy-server/telemetry'
 import { type Span } from '@opentelemetry/api'
-import { type Auth } from './static-types'
 import assert from 'assert'
+import _ from 'lodash'
+import { getMethodMapping } from './get-method-mapping.js'
+import { generateServices } from '../service-definition/index.js'
 
 interface TransportConfig {
   type: TransportNames
   options: TransportOptions
 }
+
 export async function startServer (app: Express): Promise<void> {
   assert(app, 'app must be defined')
   assert(process.env.JSON_RPC_HTTP_PORT || process.env.JSON_RPC_SOCKETS_PORT, 'env variables JSON_RPC_HTTP_PORT or JSON_RPC_SOCKETS_PORT must be defined')
   await startActiveTrace(import.meta.url, async (span: Span) => {
     try {
-      const methodMapping: MethodMapping = {
-        query: async (operationName: string, query: string, variables: Record<string, any>, auth: Auth): Promise<FormattedExecutionResult> => {
-          variables = variables ?? {}
-          const headers = { ...auth, 'json-rpc': true }
-          return await new Promise<FormattedExecutionResult>((resolve, _reject) => {
-            executeGraphQLQuery(app)({
-              operationName,
-              query,
-              variables,
-              headers,
-              callback: (_, result) => {
-                resolve(result)
-              }
-            })
-          })
-        }
-      }
+      const { services: serviceResponse } = generateServices()
+      const methods = _.flatten<Record<string, any>>((Object.entries(serviceResponse)
+        .map(([_service, rpcs]) =>
+          Object.entries(rpcs).map(([_rpcName, rpc]) => rpc.jsonRpc())) as never[]))
+      const methodMapping: MethodMapping = getMethodMapping(app, methods)
       const spec =
           fs.readFileSync(process.env.JSON_RPC_SPEC_PATH ?? './json-rpc/graphql.rpc-spec')
             .toString('utf-8')

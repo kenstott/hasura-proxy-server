@@ -21,4 +21,7 @@ message GraphQLResponse {
 
 service GraphQLService {
   rpc ExecuteQuery (GraphQLRequest) returns (GraphQLResponse);
+  <%= rootServices %>
 }
+
+<%= otherServices %>

@@ -1,17 +1,31 @@
-import type { FormattedExecutionResult, GraphQLFormattedError } from 'graphql/index'
+import type { FormattedExecutionResult, GraphQLFormattedError } from 'graphql'
 import { type JsonObject, struct } from 'pb-util'
 import type { ObjMap } from 'graphql/jsutils/ObjMap'
 import { type Express } from 'express'
 
-export interface ExecuteGraphQLQuery {
+/**
+ * @param {string} operationName - The name of the operation.
+ * @param {string} query - The GraphQL query string.
+ * @param {Object} variables - The variables to be passed to the query.
+ * @param {Object} headers - Additional headers to be included in the request.
+ * @param {function} callback - The callback function to handle the response.
+ */
+export interface InternalProxyGraphQLQuery {
   operationName: string
   query: string
   variables: Record<string, unknown>
   headers: Record<string, unknown>
-  callback: (_: null, response: { data?: any, errors?: any, extensions?: any }) => void
+  callback: (_: null, response: { data?: any, errors?: any, extensions?: any } | any) => void
 }
-export function executeGraphQLQuery (app: Express) {
-  return ({ operationName, query, variables, headers, callback }: ExecuteGraphQLQuery): void => {
+export type InternalProxyFunction = (params: InternalProxyGraphQLQuery) => void
+/**
+ * Creates an internal proxy GraphQL query function. It proxies to the HTTP server hosted by the app.
+ *
+ * @param {Express} app - The Express app to make the query to.
+ * @return {(params: InternalProxyGraphQLQuery) => void}
+ */
+export function internalProxyGraphQLQuery (app: Express): InternalProxyFunction {
+  return ({ operationName, query, variables, headers, callback }: InternalProxyGraphQLQuery): void => {
     const req = {
       method: 'POST',
       url: '/graphql-internal',

@@ -12,10 +12,14 @@
       "url": "<%= server %>:<%= port %>"
     }
   ],
+  "security": [
+     { "hasuraHeaderAuth": [] }
+  ],
   "paths": {
     "/graphql": {
       "post": {
         "summary": "Execute a GraphQL query",
+        "tags": ["GraphQL"],
         "parameters": [
           {"in": "header",
             "name": "X-Hasura-Admin-Secret",
@@ -79,6 +83,13 @@
     <%= paths %>
   },
   "components": {
+    "securitySchemes": {
+     "hasuraHeaderAuth": {
+          "type": "apiKey",
+          "in": "header",
+          "name": "X-Hasura-Admin-Secret"
+      }
+    },
     "schemas": <%= components %>
   }
 }

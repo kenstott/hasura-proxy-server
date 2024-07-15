@@ -1,17 +1,22 @@
 import { Field, type IField } from './field'
-import { JSONSchemaType } from 'ajv'
 
-export interface IMessage {
+interface IMessage {
   name: string
+  description?: string
   fields: Array<Partial<IField>>
 }
 
+/**
+ * Represents a message. This is an intermediate form of an object type that can generate a version for each supported RPC.
+ */
 export class Message implements IMessage {
   _name: string
+  description?: string
   fields: Field[]
 
   constructor (props: IMessage) {
     this.name = props.name
+    this.description = props.description
     this.fields = props.fields.map(i => new Field(i))
   }
 
@@ -23,15 +28,20 @@ export class Message implements IMessage {
     this._name = value
   }
 
+  addField (field: Field): void {
+    this.fields.push(field)
+  }
+
   print (): string {
     return `message ${this.name} {` + '\n' +
         this.fields.map((i, index) => '   ' + i.print(index + 1)).join('\n') +
         '\n}\n'
   }
 
-  jsonschema (): Record<string, any> {
+  jsonSchema (): Record<string, any> {
     return {
       type: 'object',
+      description: this.description || '',
       properties: this.fields.reduce((acc, i) => {
         return { ...acc, [i.name || '']: i.jsonSchema() }
       }, {}),

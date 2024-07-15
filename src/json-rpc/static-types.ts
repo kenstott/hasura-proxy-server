@@ -20,11 +20,3 @@ export const staticTypes = {
     }
   }
 }
-
-export interface Auth {
-  'x-hasura-admin-secret'?: string
-  baseAuth?: string
-  username?: string
-  password?: string
-  jwt?: string
-}

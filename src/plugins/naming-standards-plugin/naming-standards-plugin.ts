@@ -75,8 +75,8 @@ export const namingStandardsPlugin = plugin({
             test = (await wordnet.lookup(adjective.toLowerCase(), true)).find(i =>
               i.meta.synsetType === 'adjective' || i.meta.synsetType === 'adverb' || i.meta.synsetType === 'noun'
             )
-          } catch {
-            // ignore
+          } catch (e) {
+            test = true
           }
           if (!test) {
             contextValue.stopProcessing = true

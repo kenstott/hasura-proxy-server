@@ -4,19 +4,21 @@ import { ReflectionService } from '@grpc/reflection'
 import * as fs from 'fs'
 import { type Express } from 'express'
 import { type Struct, struct } from 'pb-util'
-import { executeGraphQLQuery } from './execute-graph-ql-query'
+import { internalProxyGraphQLQuery } from '../common/index.js'
 import { type FormattedExecutionResult } from 'graphql/execution'
-import { spanError, spanOK, startActiveTrace } from '../proxy-server/telemetry'
+import { spanError, spanOK, startActiveTrace } from '../proxy-server/telemetry.js'
 import type { Span } from '@opentelemetry/api'
 import assert from 'assert'
+import { getRootServices } from './get-root-services.js'
+import { getOtherServices } from './get-other-services.js'
 
-interface ServiceCall {
+export interface ServiceCall {
   metadata: {
     getMap: () => Record<string, unknown> }
   request: { operationName: any, query: any, variablesStruct: any, variablesString: any }
 }
 
-type Callback = (_: null, response: FormattedExecutionResult) => void
+export type Callback = (_: null, response: FormattedExecutionResult) => void
 
 export const startServer = async (app: Express): Promise<void> => {
   assert(app, 'app must be defined')
@@ -32,14 +34,17 @@ export const startServer = async (app: Express): Promise<void> => {
       const server = new grpc.Server()
       const reflection = new ReflectionService(packageDefinition)
       reflection.addToServer(server)
+      const services = await getRootServices(app)
       server.addService(graphQLService, {
         ExecuteQuery: (call: ServiceCall, callback: Callback) => {
           const headers = call.metadata.getMap()
           const { operationName, query, variablesStruct, variablesString } = call.request
           const variables = variablesString ? JSON.parse(variablesString as string) : struct.decode((variablesStruct ?? {}) as Struct)
-          executeGraphQLQuery(app)({ operationName, query, variables, headers, callback })
-        }
+          internalProxyGraphQLQuery(app)({ operationName, query, variables, headers, callback })
+        },
+        ...services
       })
+      await getOtherServices(app, server, graphqlProto)
 
       server.bindAsync(`${process.env.SERVER_NAME || 'localhost'}:${process.env.GRPC_PORT || 50051}`, grpc.ServerCredentials.createInsecure(), (error, port) => {
         if (error) {

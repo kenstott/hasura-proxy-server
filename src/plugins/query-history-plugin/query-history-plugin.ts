@@ -1,7 +1,7 @@
 import { plugin } from '../../plugin-builder/index.js'
 import { Granularity, QueryHistoryStorage } from './query-history-storage.js'
 import { MONGODB_CONNECTION_STRING } from '../../proxy-server/config.js'
-import { getFieldList, getSelectionSetHash } from '../helpers/index.js'
+import { getFieldList } from '../helpers/index.js'
 import gql from 'graphql-tag'
 import { Kind } from '../../common/index.js'
 import { v4 as uuid } from 'uuid'

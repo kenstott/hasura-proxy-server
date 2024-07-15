@@ -1,0 +1,7 @@
+query findStores($limit: Int! = 10, $where: Stores_bool_exp) {
+    Stores(limit: $limit, where: $where) {
+        storeKey
+        state
+        country
+    }
+}

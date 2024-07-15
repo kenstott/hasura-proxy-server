@@ -11,7 +11,7 @@ import _ from 'lodash'
 import { generateProtoFromSdl } from '../grpc/generate-proto-from-sdl'
 import * as fs from 'fs'
 import { generateJsonSchemaFromSdl } from '../json-rpc/generate-json-schema-from-sdl'
-import { generateRestifiedSchemaFromSdl } from '../restified/generate-restified-schema-from-sdl'
+import { generateRestifiedSchemaFromSdl } from '../openapi/generate-restified-schema-from-sdl'
 
 interface HasuraWrapperOptions {
   uri: URL
@@ -62,7 +62,9 @@ export const hasuraWrapper = async ({ uri, adminSecret, hasuraPlugins, httpServe
 }
 
 export const createSchema = async ({ uri, adminSecret, hasuraPlugins }: HasuraWrapperOptions): Promise<GraphQLSchema> => {
-  const typeDefs = hasuraPlugins.map(i => `
+  const typeDefs =
+      'directive @comment(text: String) on FIELD_DEFINITION | OBJECT | QUERY | MUTATION\n' +
+      hasuraPlugins.map(i => `
     ${i.operationDirectiveHelp ? '"""' + i.operationDirectiveHelp + '"""' : ''}
     ${i.operationDirective ? 'directive ' + i.operationDirective.replace(/\n/g, ' ') + ' on QUERY' : ''}
     ${i.additionalSDL ?? ''}

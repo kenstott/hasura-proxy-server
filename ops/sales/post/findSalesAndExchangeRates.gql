@@ -1,0 +1,18 @@
+query findSalesAndExchangeRates($where: Sales_bool_exp, $orderBy: [Sales_order_by!] = [{deliveryDate: asc}], $limit: Int = 10, $offset: Int = 10)  @comment(text: "this is a test") {
+    Sales(where: $where, order_by: $orderBy, limit: $limit, offset: $offset) @comment(text: "sales text") {
+        currencyCode  @comment(text: "currency code text")
+        customerKey
+        deliveryDate
+        lineItem
+        orderDate
+        orderNumber
+        productKey
+        quantity
+        storeKey
+        exchangeRates {
+            currency
+            date
+            exchange
+        }
+    }
+}
