@@ -157,7 +157,7 @@ export const generateRestifiedSchemaFromSdl = (schema: GraphQLSchema): string =>
     components: JSON.stringify(components, null, 2),
     server: process.env.OPENAPI_SERVER ?? 'http://localhost',
     port: PORT,
-    paths: requestsString
+    paths: requestsString ? ',\n' + requestsString : ''
   })
   const parsed = JSON.parse(restifiedSpecString)
   return JSON.stringify(parsed, null, 2)

@@ -12,6 +12,8 @@ import * as http from 'http'
 import { type Span } from '@opentelemetry/api'
 import cors from 'cors'
 import { dataProducts } from '../routes/data-products.js'
+import { getPolicies, postPolicies } from '../routes/policies'
+import { postAnthropic } from '../routes/anthropic'
 
 /**
  * @description Abstracts away all details of instantiating the Apollo Server as a Hasura Proxy.
@@ -68,6 +70,9 @@ export const startServer = async (hasuraPlugins: HasuraPlugin[]): Promise<Expres
     app.use('/graphql', express.json(), expressMiddleware(server, {
       context: hasuraContext
     }))
+    app.get('/security/policies', express.json(), getPolicies)
+    app.post('/anthropic', express.json({ limit: 100000000 }), postAnthropic)
+    app.post('/security/policies', express.json(), postPolicies)
     app.use('/graphql-internal', expressMiddleware(server, {
       context: hasuraContext
     }))
@@ -80,7 +85,8 @@ export const startServer = async (hasuraPlugins: HasuraPlugin[]): Promise<Expres
         headers: {
           'content-type': 'application/json',
           'x-hasura-role': 'admin',
-          'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET || ''
+          'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET || '',
+          hasura_cloud_pat: process.env.HASURA_ADMIN_SECRET || ''
         },
         body: JSON.stringify(req.body?.type
           ? req.body

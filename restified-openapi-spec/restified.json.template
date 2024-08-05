@@ -13,14 +13,54 @@
     }
   ],
   "security": [
-     { "hasuraHeaderAuth": [] }
+    { "hasuraHeaderAuth": [] }
   ],
   "paths": {
+    "/security/policies": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/graphql": {
       "post": {
         "summary": "Execute a GraphQL query",
         "tags": ["GraphQL"],
-       "requestBody": {
+        "requestBody": {
           "required": true,
           "content": {
             "application/json": {
@@ -71,15 +111,15 @@
           }
         }
       }
-    },
+    }
     <%= paths %>
   },
   "components": {
     "securitySchemes": {
-     "hasuraHeaderAuth": {
-          "type": "apiKey",
-          "in": "header",
-          "name": "X-Hasura-Admin-Secret"
+      "hasuraHeaderAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Hasura-Admin-Secret"
       }
     },
     "schemas": <%= components %>
